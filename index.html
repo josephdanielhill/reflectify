@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflectify — reflect on your job</title>
+  <meta name="description" content="Get a guided prompt to reflect on your job with any AI, then turn the answers into a visual report you can download as a PDF or image." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪞</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <button class="brand" type="button" data-nav="home">Reflectify</button>
+      <p class="tagline">Reflect on your job. Visualize the result.</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="view-home" class="view">
+      <div class="hero">
+        <h1>Turn a few honest answers into a report worth keeping.</h1>
+        <p class="hero__lede">
+          Reflectify has two steps: get a prompt to interview yourself with any AI,
+          then upload the JSON it gives you back here for a visual report you can
+          download. Nothing you write is ever sent anywhere — it all stays in this
+          browser tab.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <article class="option-card">
+          <div class="option-card__icon" aria-hidden="true">💬</div>
+          <h2>1. Get your prompt</h2>
+          <p>
+            Copy a ready-made prompt into ChatGPT, Claude, or any AI you like. It
+            will ask how many months you're reflecting on, your job title, then
+            guide you through tailored questions about achievements, challenges,
+            regrets, skill growth, and goals.
+          </p>
+          <button class="btn btn--primary" type="button" data-nav="prompt">Get the prompt</button>
+        </article>
+
+        <article class="option-card">
+          <div class="option-card__icon" aria-hidden="true">📊</div>
+          <h2>2. Upload your answers</h2>
+          <p>
+            When your AI finishes the interview, it will give you a JSON file (or a
+            JSON block you can save as one). Upload it here to generate a visual
+            report you can download as a PDF or an image.
+          </p>
+          <button class="btn btn--secondary" type="button" data-nav="upload">Upload your reflection</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- PROMPT -->
+    <section id="view-prompt" class="view hidden">
+      <button class="btn btn--ghost btn--back" type="button" data-nav="home">&larr; Back</button>
+      <h1>Copy this into your AI of choice</h1>
+      <p class="view-lede">
+        Paste the whole thing as your first message. Answer its questions honestly —
+        the more specific you are, the better the report. When it's done, it will
+        reply with a JSON object; save that as a <code>.json</code> file (or paste it
+        straight into the upload box) to see your report.
+      </p>
+
+      <div class="prompt-box">
+        <div class="prompt-box__toolbar">
+          <span class="prompt-box__label">Reflection interview prompt</span>
+          <button class="btn btn--primary btn--small" type="button" id="copy-prompt-btn">Copy prompt</button>
+        </div>
+        <textarea id="prompt-text" class="prompt-box__text" readonly rows="18"></textarea>
+      </div>
+
+      <button class="btn btn--secondary" type="button" data-nav="upload">I have my JSON — upload it &rarr;</button>
+    </section>
+
+    <!-- UPLOAD -->
+    <section id="view-upload" class="view hidden">
+      <button class="btn btn--ghost btn--back" type="button" data-nav="home">&larr; Back</button>
+      <h1>Upload your reflection</h1>
+      <p class="view-lede">
+        Drop the JSON file your AI gave you, or paste its contents directly below.
+      </p>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload JSON file">
+        <p class="dropzone__title">Drag &amp; drop your <code>.json</code> file here</p>
+        <p class="dropzone__or">or</p>
+        <button class="btn btn--primary" type="button" id="browse-btn">Choose a file</button>
+        <input type="file" id="file-input" accept="application/json,.json" hidden />
+      </div>
+
+      <details class="paste-fallback">
+        <summary>Or paste the JSON text directly</summary>
+        <textarea id="paste-text" rows="10" placeholder="{ &quot;schemaVersion&quot;: &quot;1.0&quot;, ... }"></textarea>
+        <button class="btn btn--secondary btn--small" type="button" id="paste-submit-btn">Generate report</button>
+      </details>
+
+      <div id="upload-errors" class="upload-errors hidden" role="alert"></div>
+    </section>
+
+    <!-- REPORT -->
+    <section id="view-report" class="view hidden">
+      <div class="report-toolbar">
+        <button class="btn btn--ghost btn--back" type="button" data-nav="home">&larr; Start over</button>
+        <div class="report-toolbar__actions">
+          <button class="btn btn--secondary btn--small" type="button" id="export-png-btn">Download image</button>
+          <button class="btn btn--primary btn--small" type="button" id="export-pdf-btn">Download PDF</button>
+        </div>
+      </div>
+      <div id="report-root" class="report"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Runs entirely in your browser. Nothing is uploaded to a server.</p>
+  </footer>
+
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
