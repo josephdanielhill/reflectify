@@ -3,114 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reflectify — reflect on your job</title>
-  <meta name="description" content="Get a guided prompt to reflect on your job with any AI, then turn the answers into a visual report you can download as a PDF or image." />
+  <title>Reflect / Card — a job reflection tool</title>
+  <meta name="description" content="Get a prompt to run through your favorite AI, then turn its answers into a visual report card you can save as a PDF or image." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪞</text></svg>" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="site-header__inner">
-      <button class="brand" type="button" data-nav="home">Reflectify</button>
-      <p class="tagline">Reflect on your job. Visualize the result.</p>
-    </div>
-  </header>
+  <div class="nav">
+    <div class="nav-brand">REFLECT&nbsp;/&nbsp;CARD</div>
+    <a href="#" id="nav-start-over" class="hidden" data-nav="home">Start over</a>
+  </div>
 
   <main>
-    <!-- HOME -->
-    <section id="view-home" class="view">
-      <div class="hero">
-        <h1>Turn a few honest answers into a report worth keeping.</h1>
-        <p class="hero__lede">
-          Reflectify has two steps: get a prompt to interview yourself with any AI,
-          then upload the JSON it gives you back here for a visual report you can
-          download. Nothing you write is ever sent anywhere — it all stays in this
-          browser tab.
+    <!-- HOME / LANDING -->
+    <section id="view-home" class="view landing">
+      <div class="landing__inner">
+        <h6 class="landing__eyebrow">A job reflection tool</h6>
+        <h1 class="landing__title">How's the job&nbsp;really&nbsp;going?</h1>
+        <p class="landing__lede">
+          Get a prompt to run through your favorite AI. It interviews you about achievements,
+          regrets, growth and goals &mdash; then hands back a JSON file. Upload it here for a
+          visual report card you can save as a PDF or image.
         </p>
-      </div>
-
-      <div class="card-grid">
-        <article class="option-card">
-          <div class="option-card__icon" aria-hidden="true">💬</div>
-          <h2>1. Get your prompt</h2>
-          <p>
-            Copy a ready-made prompt into ChatGPT, Claude, or any AI you like. It
-            will ask how many months you're reflecting on, your job title, then
-            guide you through tailored questions about achievements, challenges,
-            regrets, skill growth, and goals.
-          </p>
-          <button class="btn btn--primary" type="button" data-nav="prompt">Get the prompt</button>
-        </article>
-
-        <article class="option-card">
-          <div class="option-card__icon" aria-hidden="true">📊</div>
-          <h2>2. Upload your answers</h2>
-          <p>
-            When your AI finishes the interview, it will give you a JSON file (or a
-            JSON block you can save as one). Upload it here to generate a visual
-            report you can download as a PDF or an image.
-          </p>
-          <button class="btn btn--secondary" type="button" data-nav="upload">Upload your reflection</button>
-        </article>
+        <button class="btn btn-primary landing__cta" type="button" data-nav="prompt">
+          Generate my reflection prompt
+        </button>
+        <div class="landing__secondary-wrap">
+          <a href="#" class="landing__secondary" data-nav="upload">Already have a JSON file? Upload it &rarr;</a>
+        </div>
       </div>
     </section>
 
     <!-- PROMPT -->
-    <section id="view-prompt" class="view hidden">
-      <button class="btn btn--ghost btn--back" type="button" data-nav="home">&larr; Back</button>
-      <h1>Copy this into your AI of choice</h1>
-      <p class="view-lede">
-        Paste the whole thing as your first message. Answer its questions honestly —
-        the more specific you are, the better the report. When it's done, it will
-        reply with a JSON object; save that as a <code>.json</code> file (or paste it
-        straight into the upload box) to see your report.
-      </p>
+    <section id="view-prompt" class="view step hidden">
+      <div class="step__inner">
+        <h6 class="step__eyebrow">Step 1 of 3</h6>
+        <h2 class="step__title">Copy this into your AI of choice</h2>
+        <p class="step__lede">
+          Paste it into ChatGPT, Claude, Gemini &mdash; whatever you use. It will ask how many
+          months to reflect over, your job title, then interview you. At the end it outputs a
+          JSON file for you to save.
+        </p>
 
-      <div class="prompt-box">
-        <div class="prompt-box__toolbar">
-          <span class="prompt-box__label">Reflection interview prompt</span>
-          <button class="btn btn--primary btn--small" type="button" id="copy-prompt-btn">Copy prompt</button>
+        <div class="prompt-panel">
+          <pre id="prompt-text" class="prompt-panel__text"></pre>
         </div>
-        <textarea id="prompt-text" class="prompt-box__text" readonly rows="18"></textarea>
-      </div>
 
-      <button class="btn btn--secondary" type="button" data-nav="upload">I have my JSON — upload it &rarr;</button>
+        <div class="prompt-actions">
+          <button class="btn btn-primary" type="button" id="copy-prompt-btn">Copy prompt</button>
+          <button class="btn btn-secondary" type="button" data-nav="upload">I have my JSON &rarr;</button>
+        </div>
+      </div>
     </section>
 
     <!-- UPLOAD -->
-    <section id="view-upload" class="view hidden">
-      <button class="btn btn--ghost btn--back" type="button" data-nav="home">&larr; Back</button>
-      <h1>Upload your reflection</h1>
-      <p class="view-lede">
-        Drop the JSON file your AI gave you, or paste its contents directly below.
-      </p>
+    <section id="view-upload" class="view step hidden">
+      <div class="step__inner step__inner--narrow" id="upload-panel">
+        <h6 class="step__eyebrow">Step 2 of 3</h6>
+        <h2 class="step__title">Upload your reflection JSON</h2>
+        <p class="step__lede">
+          Drop the .json file your AI gave you, or paste its contents below.
+        </p>
 
-      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload JSON file">
-        <p class="dropzone__title">Drag &amp; drop your <code>.json</code> file here</p>
-        <p class="dropzone__or">or</p>
-        <button class="btn btn--primary" type="button" id="browse-btn">Choose a file</button>
-        <input type="file" id="file-input" accept="application/json,.json" hidden />
+        <label class="btn btn-block btn-secondary">
+          Choose JSON file&hellip;
+          <input type="file" id="file-input" accept="application/json,.json" hidden />
+        </label>
+
+        <hr class="hr" />
+
+        <div class="field">
+          <label for="paste-text">Or paste the JSON directly</label>
+          <textarea class="input" id="paste-text" rows="6" placeholder="{ &quot;jobTitle&quot;: ... }"></textarea>
+        </div>
+        <button class="btn btn-primary" type="button" id="paste-submit-btn">Load pasted JSON</button>
+
+        <p id="upload-error" class="upload-panel__error hidden" role="alert"></p>
+
+        <div class="upload-panel__sample-wrap">
+          <a href="#" class="upload-panel__sample" id="load-sample-btn">Or just see an example report &rarr;</a>
+        </div>
       </div>
-
-      <details class="paste-fallback">
-        <summary>Or paste the JSON text directly</summary>
-        <textarea id="paste-text" rows="10" placeholder="{ &quot;schemaVersion&quot;: &quot;1.0&quot;, ... }"></textarea>
-        <button class="btn btn--secondary btn--small" type="button" id="paste-submit-btn">Generate report</button>
-      </details>
-
-      <div id="upload-errors" class="upload-errors hidden" role="alert"></div>
     </section>
 
     <!-- REPORT -->
-    <section id="view-report" class="view hidden">
+    <section id="view-report" class="view report-view hidden">
       <div class="report-toolbar">
-        <button class="btn btn--ghost btn--back" type="button" data-nav="home">&larr; Start over</button>
+        <h6 class="report-toolbar__eyebrow">Step 3 of 3 &mdash; your report card</h6>
         <div class="report-toolbar__actions">
-          <button class="btn btn--secondary btn--small" type="button" id="export-png-btn">Download image</button>
-          <button class="btn btn--primary btn--small" type="button" id="export-pdf-btn">Download PDF</button>
+          <button class="btn btn-secondary" type="button" id="export-png-btn">Download image</button>
+          <button class="btn btn-primary" type="button" id="export-pdf-btn">Download PDF</button>
         </div>
       </div>
-      <div id="report-root" class="report"></div>
+      <div id="printable-report" class="report-card"></div>
     </section>
   </main>
 
@@ -119,7 +104,6 @@
   </footer>
 
   <script src="vendor/html2canvas.min.js"></script>
-  <script src="vendor/jspdf.umd.min.js"></script>
   <script type="module" src="script.js"></script>
 </body>
 </html>
