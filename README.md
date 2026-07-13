@@ -1,4 +1,4 @@
-# Reflect / Card
+# Reflectify
 
 A job reflection tool. No build step, no backend, no account — everything
 runs in your browser.
@@ -11,7 +11,7 @@ runs in your browser.
    wellbeing, and goals for the period you choose. At the end it replies with
    a JSON object.
 2. **Upload your answers.** Save that JSON (or paste it directly) into the
-   upload screen. Reflect / Card renders a visual report card: an overall
+   upload screen. Reflectify renders a visual report card: an overall
    letter grade, a sentiment meter, skills and a timeline, first-person
    quotes pulled from your answers, goals, and an energy/wellbeing trend.
    No JSON handy? Use "Or just see an example report" to preview a fully

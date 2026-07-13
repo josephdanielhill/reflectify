@@ -573,7 +573,7 @@ function renderConclusion(report) {
 function renderFooter(generatedDate) {
   return h("div", { class: "report-card__footer" }, [
     h("span", {}, `Generated ${generatedDate}`),
-    h("span", {}, "Reflect / Card"),
+    h("span", {}, "Reflectify"),
   ]);
 }
 
