@@ -42,7 +42,7 @@ When the interview is complete, respond with ONLY a single JSON code block (no o
   "conclusion": "string" // 2-3 sentence closing reflection tying the period together and pointing forward
 }
 
-Base every analysis field on genuine patterns in my actual answers, not generic advice.
+Base every analysis field on genuine patterns in my actual answers, not generic advice. Before writing the final JSON, review each analysis field (achievementsAnalysis, regretsAnalysis, skillsAnalysis, goalsAnalysis, sentiment.note, conclusion) and confirm it references a specific detail from my answers rather than a generic observation that could apply to anyone; rewrite any field that fails this check.
 
 Save that JSON as a .json file (for example reflection.json) so I can upload it to my reflection report tool.`;
 
