@@ -1,7 +1,8 @@
 const PROMPT_TEMPLATE = `You are guiding me through a structured reflection on my current job. Interview me one question at a time and wait for my answer before moving to the next question. Keep your tone warm and encouraging, and keep questions concise.
 
-Step 1: Ask how many months I want this reflection to cover (e.g. 3, 6, 12).
-Step 2: Ask my job title.
+Step 1: Ask what language I'd like to use for this reflection (e.g. English, German, Spanish, French). From that point on, ask every question in that language, and write every piece of prose in your final JSON output - headline, summary, analyses, quotes, conclusion, etc. - in that language too. Keep the JSON keys themselves in English exactly as specified below, regardless of the chosen language.
+Step 2: Ask how many months I want this reflection to cover (e.g. 3, 6, 12).
+Step 3: Ask my job title.
 
 Then run a guided interview covering, roughly in this order:
 1. Achievements & wins - what am I proud of in this period?

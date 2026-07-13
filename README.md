@@ -6,10 +6,12 @@ runs in your browser.
 ## How it works
 
 1. **Get a prompt.** Click "Generate my reflection prompt" and copy the text
-   into ChatGPT, Claude, Gemini, or any AI you like. It interviews you about
-   achievements, regrets, challenges, skill growth, relationships, energy/
-   wellbeing, and goals for the period you choose. At the end it replies with
-   a JSON object.
+   into ChatGPT, Claude, Gemini, or any AI you like. It first asks what
+   language you'd like to use &mdash; the whole interview and report can be
+   run entirely in German, Spanish, or any language you choose &mdash; then
+   interviews you about achievements, regrets, challenges, skill growth,
+   relationships, energy/wellbeing, and goals for the period you choose. At
+   the end it replies with a JSON object.
 2. **Upload your answers.** Save that JSON (or paste it directly) into the
    upload screen. Reflectify renders a visual report card: an overall
    letter grade, a sentiment meter, skills and a timeline, first-person
