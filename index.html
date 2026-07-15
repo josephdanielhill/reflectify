@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reflectify — a job reflection tool</title>
-  <meta name="description" content="Get a prompt to run through your favorite AI, then turn its answers into a visual report card you can save as a PDF or image." />
+  <title>Reflectify — a suite of reflection tools</title>
+  <meta name="description" content="Pick a reflection tool, get a prompt to run through your favorite AI, then turn its answers into a visual report card you can save as a PDF or image." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪞</text></svg>" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -14,22 +14,27 @@
     <a href="#" id="nav-start-over" class="hidden" data-nav="home">Start over</a>
   </div>
 
+  <div class="tool-hero hidden" id="tool-hero">
+    <span class="tool-hero__icon" id="tool-hero-icon"></span>
+    <div>
+      <h6 class="tool-hero__eyebrow">Reflecting on</h6>
+      <div class="tool-hero__name" id="tool-hero-name"></div>
+    </div>
+  </div>
+
   <main>
     <!-- HOME / LANDING -->
     <section id="view-home" class="view landing">
       <div class="landing__inner">
-        <h6 class="landing__eyebrow">A job reflection tool</h6>
-        <h1 class="landing__title">How's the job&nbsp;really&nbsp;going?</h1>
+        <h6 class="landing__eyebrow">A suite of reflection tools</h6>
+        <h1 class="landing__title">What do you want to&nbsp;reflect&nbsp;on?</h1>
         <p class="landing__lede">
-          Get a prompt to run through your favorite AI. It interviews you about achievements,
-          regrets, growth and goals &mdash; then hands back a JSON file. Upload it here for a
-          visual report card you can save as a PDF or image.
+          Pick a tool below. Each one hands you a prompt to run through your favorite AI, then
+          turns its answers into a visual report card you can save as a PDF or image.
         </p>
-        <button class="btn btn-primary landing__cta" type="button" data-nav="prompt">
-          Generate my reflection prompt
-        </button>
+        <div class="tool-grid" id="tool-grid"></div>
         <div class="landing__secondary-wrap">
-          <a href="#" class="landing__secondary" data-nav="upload">Already have a JSON file? Upload it &rarr;</a>
+          <a href="#" class="landing__secondary" id="home-upload-direct">Already have a JSON file? Upload it &rarr;</a>
         </div>
       </div>
     </section>

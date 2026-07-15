@@ -46,6 +46,17 @@ Base every analysis field on genuine patterns in my actual answers, not generic 
 
 Save that JSON as a .json file (for example reflection.json) so I can upload it to my reflection report tool.`;
 
+const TOOLS = [
+  {
+    id: "job-reflection",
+    icon: "💼",
+    name: "Job Reflection",
+    description:
+      "Interviews you about achievements, regrets, growth and goals from your current job, then hands back a JSON file for a visual report card.",
+    promptTemplate: PROMPT_TEMPLATE,
+  },
+];
+
 const SAMPLE_REPORT = {
   jobTitle: "Senior Product Designer",
   periodMonths: 6,
@@ -102,6 +113,7 @@ function gradeFor(score) {
 }
 
 let currentReport = null;
+let selectedTool = null;
 
 // ---------- View switching ----------
 
@@ -110,13 +122,16 @@ function showView(name) {
     section.classList.toggle("hidden", section.id !== `view-${name}`);
   });
   document.getElementById("nav-start-over").classList.toggle("hidden", name === "home");
+  document.getElementById("tool-hero").classList.toggle("hidden", name === "home" || !selectedTool);
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
 }
 
 document.querySelectorAll("[data-nav]").forEach((el) => {
   el.addEventListener("click", (e) => {
     e.preventDefault();
-    showView(el.dataset.nav);
+    const target = el.dataset.nav;
+    if (target === "home") selectedTool = null;
+    showView(target);
   });
 });
 
@@ -136,19 +151,66 @@ function h(tag, attrs = {}, children = []) {
   return el;
 }
 
+// ---------- Tool selection ----------
+
+function initToolGrid() {
+  const grid = document.getElementById("tool-grid");
+
+  TOOLS.forEach((tool) => {
+    const card = h("button", { class: "tool-card", type: "button" }, [
+      h("div", { class: "tool-card__icon" }, tool.icon),
+      h("h3", { class: "tool-card__title" }, tool.name),
+      h("p", { class: "tool-card__desc" }, tool.description),
+      h("span", { class: "tool-card__cta" }, "Start →"),
+    ]);
+    card.addEventListener("click", () => selectTool(tool.id));
+    grid.appendChild(card);
+  });
+
+  grid.appendChild(
+    h("div", { class: "tool-card tool-card--placeholder" }, [
+      h("div", { class: "tool-card__icon" }, "✨"),
+      h("h3", { class: "tool-card__title" }, "More tools coming soon"),
+      h("p", { class: "tool-card__desc" }, "Reflectify is growing into a suite of reflection tools beyond the job check-in."),
+    ])
+  );
+
+  document.getElementById("home-upload-direct").addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!selectedTool) selectedTool = TOOLS[0];
+    updateToolHero();
+    showView("upload");
+  });
+}
+
+function selectTool(toolId) {
+  selectedTool = TOOLS.find((t) => t.id === toolId) || null;
+  updateToolHero();
+  renderPromptText();
+  showView("prompt");
+}
+
+function updateToolHero() {
+  if (!selectedTool) return;
+  document.getElementById("tool-hero-icon").textContent = selectedTool.icon;
+  document.getElementById("tool-hero-name").textContent = selectedTool.name;
+}
+
 // ---------- Prompt view ----------
 
-function initPromptView() {
-  const textEl = document.getElementById("prompt-text");
-  textEl.textContent = PROMPT_TEMPLATE;
+function renderPromptText() {
+  document.getElementById("prompt-text").textContent = selectedTool ? selectedTool.promptTemplate : "";
+}
 
+function initPromptView() {
   const copyBtn = document.getElementById("copy-prompt-btn");
   copyBtn.addEventListener("click", async () => {
+    const template = selectedTool ? selectedTool.promptTemplate : "";
     try {
-      await navigator.clipboard.writeText(PROMPT_TEMPLATE);
+      await navigator.clipboard.writeText(template);
     } catch {
       const temp = document.createElement("textarea");
-      temp.value = PROMPT_TEMPLATE;
+      temp.value = template;
       temp.style.position = "fixed";
       temp.style.opacity = "0";
       document.body.appendChild(temp);
@@ -651,6 +713,7 @@ function initExportButtons() {
 
 // ---------- Init ----------
 
+initToolGrid();
 initPromptView();
 initUploadView();
 initExportButtons();
