@@ -157,14 +157,25 @@ function initToolGrid() {
   const grid = document.getElementById("tool-grid");
 
   TOOLS.forEach((tool) => {
-    const card = h("button", { class: "tool-card", type: "button" }, [
+    const main = h("button", { class: "tool-card__main", type: "button" }, [
       h("div", { class: "tool-card__icon" }, tool.icon),
       h("h3", { class: "tool-card__title" }, tool.name),
       h("p", { class: "tool-card__desc" }, tool.description),
       h("span", { class: "tool-card__cta" }, "Start →"),
     ]);
-    card.addEventListener("click", () => selectTool(tool.id));
-    grid.appendChild(card);
+    main.addEventListener("click", () => selectTool(tool.id, "prompt"));
+
+    const uploadLink = h(
+      "a",
+      { class: "tool-card__upload-link", href: "#" },
+      "Already have a JSON file? Upload it →"
+    );
+    uploadLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      selectTool(tool.id, "upload");
+    });
+
+    grid.appendChild(h("div", { class: "tool-card" }, [main, uploadLink]));
   });
 
   grid.appendChild(
@@ -174,20 +185,13 @@ function initToolGrid() {
       h("p", { class: "tool-card__desc" }, "Reflectify is growing into a suite of reflection tools beyond the job check-in."),
     ])
   );
-
-  document.getElementById("home-upload-direct").addEventListener("click", (e) => {
-    e.preventDefault();
-    if (!selectedTool) selectedTool = TOOLS[0];
-    updateToolHero();
-    showView("upload");
-  });
 }
 
-function selectTool(toolId) {
+function selectTool(toolId, destination) {
   selectedTool = TOOLS.find((t) => t.id === toolId) || null;
   updateToolHero();
   renderPromptText();
-  showView("prompt");
+  showView(destination);
 }
 
 function updateToolHero() {
