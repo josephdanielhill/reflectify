@@ -115,6 +115,12 @@ function gradeFor(score) {
 let currentReport = null;
 let selectedTool = null;
 
+// ---------- Analytics ----------
+
+function trackEvent(name) {
+  window.fathom?.trackEvent(name);
+}
+
 // ---------- View switching ----------
 
 function showView(name) {
@@ -131,6 +137,7 @@ document.querySelectorAll("[data-nav]").forEach((el) => {
     e.preventDefault();
     const target = el.dataset.nav;
     if (target === "home") selectedTool = null;
+    if (target === "upload") trackEvent("Job Reflection: Have JSON Click");
     showView(target);
   });
 });
@@ -163,7 +170,10 @@ function initToolGrid() {
       h("p", { class: "tool-card__desc" }, tool.description),
       h("span", { class: "tool-card__cta" }, "Start →"),
     ]);
-    main.addEventListener("click", () => selectTool(tool.id, "prompt"));
+    main.addEventListener("click", () => {
+      trackEvent("Job Reflection: Card Click");
+      selectTool(tool.id, "prompt");
+    });
 
     const uploadLink = h(
       "a",
@@ -172,6 +182,7 @@ function initToolGrid() {
     );
     uploadLink.addEventListener("click", (e) => {
       e.preventDefault();
+      trackEvent("Job Reflection: Have JSON Click");
       selectTool(tool.id, "upload");
     });
 
@@ -209,6 +220,7 @@ function renderPromptText() {
 function initPromptView() {
   const copyBtn = document.getElementById("copy-prompt-btn");
   copyBtn.addEventListener("click", async () => {
+    trackEvent("Job Reflection: Copy Prompt");
     const template = selectedTool ? selectedTool.promptTemplate : "";
     try {
       await navigator.clipboard.writeText(template);
@@ -256,6 +268,7 @@ function initUploadView() {
   });
 
   pasteSubmitBtn.addEventListener("click", () => {
+    trackEvent("Job Reflection: Load JSON");
     if (pasteText.value.trim()) handleJsonText(pasteText.value);
   });
 
@@ -704,6 +717,7 @@ function initExportButtons() {
   pngBtn.addEventListener(
     "click",
     withExportButton(pngBtn, async () => {
+      trackEvent("Job Reflection: Download Image");
       const canvas = await captureReportCanvas();
       const link = document.createElement("a");
       link.download = filenameFor("png");
@@ -712,7 +726,10 @@ function initExportButtons() {
     })
   );
 
-  pdfBtn.addEventListener("click", () => window.print());
+  pdfBtn.addEventListener("click", () => {
+    trackEvent("Job Reflection: Download PDF");
+    window.print();
+  });
 }
 
 // ---------- Init ----------
