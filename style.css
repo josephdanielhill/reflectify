@@ -322,6 +322,21 @@ textarea.input {
   margin-top: var(--space-2);
 }
 .tool-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-text);
+  border-radius: var(--radius-md);
+}
+.tool-card:hover {
+  background: var(--color-neutral-200);
+  border-color: var(--color-accent);
+}
+.tool-card:active {
+  background: var(--color-neutral-300);
+}
+.tool-card__main {
   appearance: none;
   -webkit-appearance: none;
   display: flex;
@@ -333,17 +348,9 @@ textarea.input {
   font: inherit;
   color: inherit;
   text-align: left;
-  background: var(--color-surface);
-  border: 2px solid var(--color-text);
-  border-radius: var(--radius-md);
+  background: transparent;
+  border: none;
   cursor: pointer;
-}
-.tool-card:hover {
-  background: var(--color-neutral-200);
-  border-color: var(--color-accent);
-}
-.tool-card:active {
-  background: var(--color-neutral-300);
 }
 .tool-card__icon {
   font-size: 28px;
@@ -365,7 +372,13 @@ textarea.input {
   color: var(--color-accent);
   margin-top: var(--space-2);
 }
+.tool-card__upload-link {
+  display: block;
+  font-size: 12px;
+  padding: 0 var(--space-4) var(--space-4);
+}
 .tool-card--placeholder {
+  padding: var(--space-4);
   cursor: default;
   opacity: 0.55;
   border-style: dashed;
