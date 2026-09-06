@@ -1,0 +1,10 @@
+<svg width="240" height="60" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Editorial Leaf & Mirror Icon -->
+  <g transform="translate(10, 10)">
+    <rect x="0" y="0" width="40" height="40" rx="20" fill="#EBF3EF" />
+    <path d="M20 8 C 10 18, 10 28, 20 34 C 30 28, 30 18, 20 8 Z" fill="#2D4A3E" />
+    <path d="M20 14 C 27 19, 27 27, 20 31" stroke="#E8A88A" stroke-width="2.5" stroke-linecap="round" fill="none" />
+  </g>
+  <!-- Serif Editorial Text -->
+  <text x="62" y="38" font-family="'Newsreader', Georgia, serif" font-weight="500" font-size="28" fill="#2D4A3E" letter-spacing="-0.5">Reflectify</text>
+</svg>
