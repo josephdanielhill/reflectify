@@ -1482,6 +1482,7 @@ textarea.input {
   background: #ffffff;
   border-top: 1px solid rgba(45, 74, 62, 0.1);
   border-bottom: 1px solid rgba(45, 74, 62, 0.1);
+  border-radius: 32px;
   padding: 96px 32px;
   width: 100%;
 }
