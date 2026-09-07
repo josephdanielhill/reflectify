@@ -385,6 +385,161 @@ textarea.input {
   display: block;
 }
 
+/* ---------- Beta feedback floating widget ---------- */
+.beta-feedback {
+  position: fixed;
+  right: 24px;
+  bottom: 28px;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Collapsed floating leaf button */
+.beta-feedback__fab {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent-800);
+  color: #F7F5F0;
+  box-shadow: 0 8px 24px rgba(45, 74, 62, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.beta-feedback__fab:hover {
+  background: var(--color-accent-700);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(45, 74, 62, 0.4);
+}
+.beta-feedback__fab:active {
+  transform: translateY(0) scale(0.96);
+}
+.beta-feedback__icon {
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+}
+
+/* Leaf and flower states inside the FAB */
+.beta-feedback__leaf {
+  transform-origin: center;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.beta-feedback__flower {
+  opacity: 0;
+  transform: scale(0.35) rotate(-8deg);
+  transform-origin: 16px 16px;
+  transition: opacity 0.22s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.beta-feedback__petal-path {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  opacity: 0;
+  transform: scale(0);
+}
+.beta-feedback__center {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Open: leaf fades/shrinks away while the flower blooms in */
+.beta-feedback.is-open .beta-feedback__leaf {
+  opacity: 0;
+  transform: scale(0.45) rotate(-24deg);
+}
+.beta-feedback.is-open .beta-feedback__flower {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+.beta-feedback.is-open .beta-feedback__petal:nth-child(1) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(2) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(3) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(4) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(5) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(6) .beta-feedback__petal-path {
+  animation: betaPetalBloom 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.beta-feedback.is-open .beta-feedback__petal:nth-child(1) .beta-feedback__petal-path { animation-delay: 0.00s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(2) .beta-feedback__petal-path { animation-delay: 0.05s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(3) .beta-feedback__petal-path { animation-delay: 0.10s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(4) .beta-feedback__petal-path { animation-delay: 0.15s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(5) .beta-feedback__petal-path { animation-delay: 0.20s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(6) .beta-feedback__petal-path { animation-delay: 0.25s; }
+.beta-feedback.is-open .beta-feedback__center {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.25s ease 0.24s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.24s;
+}
+
+@keyframes betaPetalBloom {
+  from { opacity: 0; transform: scale(0) rotate(-12deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beta-feedback__petal-path, .beta-feedback__center, .beta-feedback__leaf,
+  .beta-feedback__flower {
+    animation: none !important; transition: none !important;
+    opacity: 1 !important; transform: none !important;
+  }
+}
+
+/* Expanding panel (hidden by default) */
+.beta-feedback__panel {
+  max-width: 280px;
+  background: #ffffff;
+  border: 1px solid rgba(45, 74, 62, 0.15);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(30, 36, 33, 0.18);
+  padding: 18px 20px;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transform-origin: bottom right;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.beta-feedback__title {
+  margin: 0 0 4px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-accent-900);
+}
+.beta-feedback__text {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-neutral-700);
+}
+.beta-feedback__link {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.beta-feedback__link:hover {
+  text-decoration: underline;
+}
+
+/* Open state */
+.beta-feedback.is-open .beta-feedback__panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.beta-feedback.is-open .beta-feedback__fab {
+  background: var(--color-accent-700);
+}
+/* End beta-feedback widget */
+
 /* ---------- Landing ---------- */
 
 .landing {
@@ -465,6 +620,7 @@ textarea.input {
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-1);
+  margin-top: var(--space-3);
 }
 .tool-card__main {
   appearance: none;
@@ -472,7 +628,7 @@ textarea.input {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-2);
+  gap: var(--space-3);
   width: 100%;
   padding: 0 0 var(--space-4);
   font: inherit;
@@ -492,7 +648,10 @@ textarea.input {
 }
 .tool-card__title {
   margin: 0;
-  font-size: 18px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.15;
 }
 .tool-card__desc {
   font-size: 13px;

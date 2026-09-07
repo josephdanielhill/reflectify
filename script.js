@@ -1116,6 +1116,36 @@ function initHeroWobble() {
   });
 }
 
+// ---------- Beta feedback floating widget ----------
+// Toggles the floating beta-feedback panel open/closed on button press,
+// and dismisses it when clicking outside or pressing Escape.
+function initBetaFeedback() {
+  const root = document.getElementById("beta-feedback");
+  const fab = document.getElementById("beta-feedback-fab");
+  const panel = document.getElementById("beta-feedback-panel");
+  if (!root || !fab || !panel) return;
+
+  function setOpen(open) {
+    root.classList.toggle("is-open", open);
+    fab.setAttribute("aria-expanded", String(open));
+    panel.setAttribute("aria-hidden", String(!open));
+  }
+
+  fab.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setOpen(!root.classList.contains("is-open"));
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!root.classList.contains("is-open")) return;
+    if (!root.contains(e.target)) setOpen(false);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && root.classList.contains("is-open")) setOpen(false);
+  });
+}
+
 // ---------- Init ----------
 
 initToolGrid();
@@ -1123,4 +1153,5 @@ initPromptView();
 initUploadView();
 initExportButtons();
 initHeroWobble();
+initBetaFeedback();
 showView("home");
