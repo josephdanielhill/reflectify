@@ -1099,17 +1099,70 @@ textarea.input {
   align-items: center;
 }
 
+/* Hero illustration — interactive 3D wobble + glossy sheen.
+   The wrapper is the tilted, clipped frame; the image inside is
+   rotated toward the cursor in JS (smooth eased), and two overlay
+   layers give it a soft, shiny glass finish that tracks the pointer. */
 .landing-hero__media {
   position: relative;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(45, 74, 62, 0.12);
+  overflow: hidden;
+  perspective: 900px;
+  transform-style: preserve-3d;
 }
 
 .landing-hero__img {
   width: 100%;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(45, 74, 62, 0.12);
   display: block;
   object-fit: cover;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transform: scale(1.03);
+}
+
+/* Resting glass sheen — a soft diagonal light band so the flat
+   illustration reads as smooth and slightly lacquered. */
+.landing-hero__media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(115deg,
+      rgba(255, 255, 255, 0) 16%,
+      rgba(255, 255, 255, 0.11) 38%,
+      rgba(255, 255, 255, 0.03) 52%,
+      rgba(255, 255, 255, 0.15) 68%,
+      rgba(255, 255, 255, 0) 86%);
+  opacity: 0.75;
+}
+
+/* Moving specular highlight that follows the cursor (hover only). */
+.landing-hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(460px circle at var(--hx, 50%) var(--hy, 45%),
+    rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 55%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.landing-hero__media.hero-hover::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero__media::after {
+    display: none;
+  }
 }
 
 /* Landing Process Section */
