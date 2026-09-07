@@ -1245,14 +1245,17 @@ textarea.input {
   body * {
     visibility: hidden;
   }
-  #printable-report, #printable-report * {
+  #report-card, #report-card * {
     visibility: visible;
   }
-  #printable-report {
+  #report-card {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
   }
   @page {
     margin: 10mm;
