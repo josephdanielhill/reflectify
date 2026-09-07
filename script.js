@@ -175,10 +175,15 @@ document.querySelectorAll("[data-nav]").forEach((el) => {
 
 // ---------- DOM builder ----------
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+const SVG_TAGS = new Set(["svg", "g", "rect", "path", "text", "circle", "defs", "use", "clipPath", "linearGradient", "stop"]);
+
 function h(tag, attrs = {}, children = []) {
-  const el = document.createElement(tag);
+  const el = SVG_TAGS.has(tag)
+    ? document.createElementNS(SVG_NS, tag)
+    : document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
-    if (key === "class") el.className = value;
+    if (key === "class") el.setAttribute("class", value);
     else if (key === "html") el.innerHTML = value;
     else el.setAttribute(key, value);
   }
@@ -632,13 +637,15 @@ function renderTopic(index, title, leftCol, rightCol, rightHeading = "Analysis &
 
   children.push(
     h("div", { class: "report-card__grid" }, [
-      h("div", { class: "report-card__col report-card__col--divider report-card__col--your" }, [
+      h("div", { class: "report-card__col report-card__col--your" }, [
         h("h6", { class: "report-card__label report-card__label--muted" }, "Your reflection"),
         ...leftCol,
       ]),
       h("div", { class: "report-card__col report-card__col--insight" }, [
-        h("h6", { class: "report-card__label" }, rightHeading),
-        ...rightCol,
+        h("div", { class: "report-card__insight-card" }, [
+          h("h6", { class: "report-card__label report-card__insight-label" }, rightHeading),
+          ...rightCol,
+        ]),
       ]),
     ])
   );
@@ -691,12 +698,18 @@ function renderSuggestions(items, empty = null) {
   ];
 }
 
-function quoteNodes(report, section) {
+function quoteNodes(report, section, items) {
   if (!Array.isArray(report.quotes)) return [];
+  // Quotes already shown inline on an item (item.quote) should not repeat in the
+  // section band (BLD-1005). Fall back to BLD-999-era layout if none match.
+  const inlineTexts = new Set(
+    (items || []).map((i) => (i && typeof i === "object" ? i.quote || i.text : null)).filter(Boolean)
+  );
   return report.quotes
     .filter((q) => q && (q.section || "").toLowerCase() === section)
     .map((q) => q.text || q.quote)
     .filter(Boolean)
+    .filter((text) => !inlineTexts.has(text))
     .map((text) => h("p", { class: "report-card__inline-quote" }, `“${text}”`));
 }
 
@@ -716,7 +729,7 @@ function renderGeneralQuotes(report) {
 
 function renderTopicAchievements(report) {
   const left = [
-    ...quoteNodes(report, "achievements"),
+    ...quoteNodes(report, "achievements", report.achievements),
     ...renderTopicSectionIntro(report.achievements),
   ];
   if (!left.length && !report.achievementsAnalysis) return null;
@@ -730,7 +743,7 @@ function renderTopicAchievements(report) {
 
 function renderTopicChallenges(report) {
   const left = [
-    ...quoteNodes(report, "challenges"),
+    ...quoteNodes(report, "challenges", report.challenges),
     ...renderTopicSectionIntro(report.challenges),
   ];
   if (!left.length && !report.challengesAnalysis) return null;
@@ -743,7 +756,7 @@ function renderTopicChallenges(report) {
 
 function renderTopicRegrets(report) {
   const left = [
-    ...quoteNodes(report, "regrets"),
+    ...quoteNodes(report, "regrets", report.regrets),
     ...renderTopicSectionIntro(report.regrets),
   ];
   if (!left.length && !report.regretsAnalysis) return null;
@@ -757,7 +770,7 @@ function renderTopicRegrets(report) {
 
 function renderTopicSkills(report) {
   const left = [
-    ...quoteNodes(report, "skills"),
+    ...quoteNodes(report, "skills", report.skills),
     ...(report.skills && report.skills.length
       ? report.skills.map((skill) =>
           h("div", { class: "report-card__skill" }, [
@@ -797,7 +810,7 @@ function renderTopicSkills(report) {
 
 function renderTopicGoals(report) {
   const left = [
-    ...quoteNodes(report, "goals"),
+    ...quoteNodes(report, "goals", report.goals),
     ...renderTopicSectionIntro(report.goals),
   ];
   const right = [
@@ -813,7 +826,7 @@ function renderTopicGoals(report) {
 
 function renderTopicWellbeing(report) {
   const wellbeingChildren = [
-    ...quoteNodes(report, "wellbeing"),
+    ...quoteNodes(report, "wellbeing", []),
     h("div", { class: "report-card__skill-head" }, [
       h("span", {}, "Energy across the period"),
       h("span", {}, String(report.wellbeing ? report.wellbeing.score : "")),
@@ -874,16 +887,19 @@ function renderSentiment(report) {
   const positives = Array.isArray(s.positives) ? s.positives : [];
   const improvements = Array.isArray(s.improvements) ? s.improvements : [];
   const children = [
-    h("div", { class: "report-card__sentiment-meta" }, [
-      h("h6", { class: "report-card__label" }, "Sentiment"),
-      h("div", { class: "report-card__sentiment-value" }, s.label),
-    ]),
-    h("div", { class: "report-card__sentiment-body" }, [
-      h("div", { class: "report-card__bar" }, [
-        h("div", { class: "report-card__bar-fill", style: `width:${s.pct}` }),
+    h("div", { class: "report-card__sentiment-main" }, [
+      h("div", { class: "report-card__sentiment-meta" }, [
+        h("h6", { class: "report-card__label" }, "Sentiment"),
+        h("div", { class: "report-card__sentiment-value" }, s.label),
       ]),
-      s.note ? h("p", { class: "report-card__sentiment-note" }, s.note) : null,
+      h("div", { class: "report-card__sentiment-meter" }, [
+        h("div", { class: "report-card__bar report-card__bar--sentiment" }, [
+          h("div", { class: "report-card__bar-fill", style: `width:${s.pct}` }),
+        ]),
+        h("span", { class: "report-card__sentiment-score" }, String(s.score)),
+      ]),
     ]),
+    s.note ? h("p", { class: "report-card__sentiment-note" }, s.note) : null,
   ];
 
   // Per-section sentiment signals (BLD-1000): positives to keep, improvements to watch.

@@ -693,6 +693,13 @@ textarea.input {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 24px;
+}
+.report-card__brand-logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  flex: none;
 }
 .report-card__period-badge {
   display: inline-block;
@@ -751,12 +758,19 @@ textarea.input {
 }
 
 .report-card__sentiment {
-  padding: 24px 48px;
+  padding: 32px 48px;
   background: #ffffff;
   border-bottom: 1px solid rgba(45, 74, 62, 0.1);
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.report-card__sentiment-main {
+  display: flex;
   align-items: center;
-  gap: 24px;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 .report-card__sentiment-meta {
   flex: none;
@@ -764,17 +778,36 @@ textarea.input {
 .report-card__sentiment-value {
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 18px;
+  font-size: 26px;
   color: var(--color-accent);
+  line-height: 1.15;
 }
-.report-card__sentiment-body {
+.report-card__sentiment-meter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+.report-card__bar--sentiment {
+  height: 14px;
   flex: 1;
 }
+.report-card__sentiment-score {
+  flex: none;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--color-accent);
+  min-width: 40px;
+  text-align: right;
+}
 .report-card__sentiment-note {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-neutral-700);
-  margin: 4px 0 0;
-  line-height: 1.4;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 72%;
 }
 
 .report-card__summary {
@@ -967,10 +1000,28 @@ textarea.input {
 /* "Your own words" vs "AI read / next" split within a topic */
 .report-card__col--your {
   border-right: 1px solid rgba(45, 74, 62, 0.12);
-  padding-right: 24px;
+  padding-right: 32px;
 }
 .report-card__col--insight {
-  padding-left: 8px;
+  padding-left: 32px;
+  align-self: start;
+}
+.report-card__col--insight .report-card__insight-card {
+  background: linear-gradient(180deg, #FBF3EC 0%, #F6E9DC 100%); /* warm clay */
+  border: 1px solid #EAD7C4;
+  border-left: 4px solid var(--color-terracotta);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+}
+.report-card__insight-label {
+  color: var(--color-terracotta);
+  font-size: 12px;
+  letter-spacing: 0.09em;
+  margin-bottom: 12px;
+}
+.report-card__col--insight .report-card__note,
+.report-card__col--insight p {
+  color: #5C4636;
 }
 @media (max-width: 760px) {
   .report-card__col--your {
