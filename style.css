@@ -498,11 +498,11 @@ textarea.input {
   justify-content: center;
 }
 .step__inner {
-  max-width: 800px;
+  max-width: 1000px;
   width: 100%;
 }
 .step__inner--narrow {
-  max-width: 640px;
+  max-width: 720px;
 }
 .step__eyebrow {
   display: inline-block;
@@ -567,19 +567,21 @@ textarea.input {
 
 /* ---------- Report toolbar ---------- */
 
-.report-view {
-  padding: var(--space-8);
+/* ---------- Reflection Summary Card & Toolbar ---------- */
+
+#view-report {
   align-items: center;
+  padding: var(--space-8) var(--space-4);
 }
 .report-toolbar {
   width: 1000px;
   max-width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: var(--space-4);
+  margin: 0 auto var(--space-6);
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 .report-toolbar__eyebrow {
   color: var(--color-terracotta);
@@ -916,7 +918,7 @@ textarea.input {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 760px) {
-  .report-view {
+  #view-report {
     padding: var(--space-4) 16px var(--space-8);
   }
   .report-toolbar {
