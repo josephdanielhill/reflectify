@@ -226,6 +226,18 @@ function updateToolHero() {
   if (!selectedTool) return;
   document.getElementById("tool-hero-icon").textContent = selectedTool.icon;
   document.getElementById("tool-hero-name").textContent = selectedTool.name;
+  document.getElementById("tool-hero-title").textContent = selectedTool.name;
+  document.getElementById("tool-hero-desc").textContent = selectedTool.description || "";
+  
+  const heroMedia = document.getElementById("tool-hero-media");
+  const heroImg = document.getElementById("tool-hero-img");
+  if (selectedTool.image) {
+    heroImg.src = selectedTool.image;
+    heroImg.alt = selectedTool.name;
+    heroMedia.classList.remove("hidden");
+  } else {
+    heroMedia.classList.add("hidden");
+  }
 }
 
 // ---------- Prompt view ----------

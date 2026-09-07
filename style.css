@@ -282,28 +282,67 @@ textarea.input {
   padding: 8px 18px;
 }
 
-/* ---------- Tool hero (shown under nav on step pages) ---------- */
+/* ---------- Tool hero (shown on step pages) ---------- */
 
 .tool-hero {
-  display: flex;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(45, 74, 62, 0.12);
+  padding: 40px 32px;
+}
+.tool-hero__inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 2px solid var(--color-divider);
-  background: var(--color-surface);
+}
+.tool-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-mint-light);
+  color: var(--color-terracotta);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
 }
 .tool-hero__icon {
-  font-size: 28px;
+  font-size: 16px;
   line-height: 1;
-}
-.tool-hero__eyebrow {
-  color: var(--color-terracotta);
-  margin: 0;
 }
 .tool-hero__name {
   font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
-  font-size: 18px;
+}
+.tool-hero__title {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+.tool-hero__desc {
+  font-size: 16px;
+  color: var(--color-neutral-700);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 520px;
+}
+.tool-hero__media {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(45, 74, 62, 0.12);
+}
+.tool-hero__img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
 }
 
 /* ---------- Landing ---------- */
@@ -452,37 +491,51 @@ textarea.input {
   border-color: var(--color-divider);
 }
 
-/* ---------- Step (prompt / upload) ---------- */
-
+/* Step (prompt / upload) */
 .step {
-  padding: var(--space-8);
+  padding: 48px 32px 80px;
   display: flex;
   justify-content: center;
 }
 .step__inner {
-  max-width: 720px;
+  max-width: 800px;
   width: 100%;
 }
 .step__inner--narrow {
   max-width: 640px;
 }
 .step__eyebrow {
+  display: inline-block;
   color: var(--color-terracotta);
+  background: var(--color-mint-light);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
 }
 .step__title {
-  margin-bottom: var(--space-3);
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--color-accent);
+  margin-bottom: 12px;
 }
 .step__lede {
-  opacity: 0.8;
-  margin-bottom: var(--space-4);
+  font-size: 15px;
+  color: var(--color-neutral-700);
+  line-height: 1.6;
+  margin-bottom: 24px;
 }
 
 .prompt-panel {
-  border: 2px solid var(--color-text);
-  background: var(--color-surface);
-  padding: var(--space-4);
+  border: 1px solid rgba(45, 74, 62, 0.15);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  padding: 24px;
   max-height: 420px;
   overflow: auto;
+  box-shadow: var(--shadow-sm);
 }
 .prompt-panel__text {
   white-space: pre-wrap;
@@ -1059,6 +1112,10 @@ textarea.input {
   }
   .landing-hero__text .landing__title {
     font-size: 38px;
+  }
+  .tool-hero__inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 }
 
