@@ -1027,3 +1027,16 @@ textarea.input {
     font-size: 38px;
   }
 }
+
+@media (max-width: 600px) {
+  .landing-hero__ctas {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .landing-hero__ctas .btn {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
