@@ -52,7 +52,7 @@
   --color-terracotta-tint: rgba(200, 109, 81, 0.2);
 
   --font-heading: "Newsreader", Georgia, serif;
-  --font-heading-weight: 600;
+  --font-heading-weight: 500;
   --font-body: "Inter", system-ui, -apple-system, sans-serif;
 
   --space-1: 4px;
@@ -813,7 +813,7 @@ textarea.input {
   padding: 40px 48px;
 }
 .report-card__quotes-label {
-  color: var(--color-terracotta);
+  color: #E8A88A;
   font-family: var(--font-heading);
   font-size: 13px;
   text-transform: uppercase;
@@ -827,7 +827,7 @@ textarea.input {
   font-size: 22px;
   line-height: 1.4;
   margin: 0 0 20px;
-  color: var(--color-mint-light);
+  color: #ffffff;
 }
 .report-card__quote:last-child {
   margin-bottom: 0;
@@ -916,6 +916,22 @@ textarea.input {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 760px) {
+  .report-view {
+    padding: var(--space-4) 16px var(--space-8);
+  }
+  .report-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .report-toolbar .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .report-card {
+    border-radius: 16px;
+    margin: 0 auto;
+  }
   .report-card__grid {
     grid-template-columns: 1fr;
   }
@@ -930,13 +946,36 @@ textarea.input {
   .report-card__quotes,
   .report-card__conclusion,
   .report-card__footer {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .report-card__header-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
   .report-card__header-main {
     flex-direction: column;
     align-items: flex-start;
     gap: 20px;
+  }
+  .report-card__title {
+    font-size: 32px;
+  }
+  .report-card__grade {
+    align-self: flex-start;
+    text-align: left;
+  }
+  .report-card__grade-value {
+    font-size: 64px;
+  }
+  .report-card__sentiment {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .report-card__quote {
+    font-size: 18px;
   }
 }
 
