@@ -178,7 +178,9 @@ function initToolGrid() {
         h("h3", { class: "tool-card__title" }, tool.name),
       ]),
       h("p", { class: "tool-card__desc" }, tool.description),
-      h("span", { class: "tool-card__cta" }, "Start →"),
+      h("div", { class: "tool-card__cta-wrap" }, [
+        h("span", { class: "btn btn-primary tool-card__btn" }, "Start reflection →"),
+      ]),
     ]);
     main.addEventListener("click", () => {
       trackEvent("Job Reflection: Card Click");

@@ -495,12 +495,14 @@ textarea.input {
   margin: 0;
   flex: 1;
 }
-.tool-card__cta {
-  font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
-  font-size: 12px;
-  color: var(--color-accent);
-  margin-top: var(--space-2);
+.tool-card__cta-wrap {
+  margin-top: var(--space-3);
+  display: flex;
+}
+.tool-card__btn {
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 14px;
 }
 .tool-card__upload-link {
   display: block;
