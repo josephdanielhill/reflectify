@@ -421,8 +421,74 @@ textarea.input {
   transform: translateY(0) scale(0.96);
 }
 .beta-feedback__icon {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+}
+
+/* Leaf and flower states inside the FAB */
+.beta-feedback__leaf {
+  transform-origin: center;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.beta-feedback__flower {
+  opacity: 0;
+  transform: scale(0.35) rotate(-8deg);
+  transform-origin: 16px 16px;
+  transition: opacity 0.22s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.beta-feedback__petal-path {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  opacity: 0;
+  transform: scale(0);
+}
+.beta-feedback__center {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Open: leaf fades/shrinks away while the flower blooms in */
+.beta-feedback.is-open .beta-feedback__leaf {
+  opacity: 0;
+  transform: scale(0.45) rotate(-24deg);
+}
+.beta-feedback.is-open .beta-feedback__flower {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+.beta-feedback.is-open .beta-feedback__petal:nth-child(1) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(2) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(3) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(4) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(5) .beta-feedback__petal-path,
+.beta-feedback.is-open .beta-feedback__petal:nth-child(6) .beta-feedback__petal-path {
+  animation: betaPetalBloom 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.beta-feedback.is-open .beta-feedback__petal:nth-child(1) .beta-feedback__petal-path { animation-delay: 0.00s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(2) .beta-feedback__petal-path { animation-delay: 0.05s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(3) .beta-feedback__petal-path { animation-delay: 0.10s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(4) .beta-feedback__petal-path { animation-delay: 0.15s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(5) .beta-feedback__petal-path { animation-delay: 0.20s; }
+.beta-feedback.is-open .beta-feedback__petal:nth-child(6) .beta-feedback__petal-path { animation-delay: 0.25s; }
+.beta-feedback.is-open .beta-feedback__center {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.25s ease 0.24s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.24s;
+}
+
+@keyframes betaPetalBloom {
+  from { opacity: 0; transform: scale(0) rotate(-12deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beta-feedback__petal-path, .beta-feedback__center, .beta-feedback__leaf,
+  .beta-feedback__flower {
+    animation: none !important; transition: none !important;
+    opacity: 1 !important; transform: none !important;
+  }
 }
 
 /* Expanding panel (hidden by default) */
@@ -472,12 +538,7 @@ textarea.input {
 .beta-feedback.is-open .beta-feedback__fab {
   background: var(--color-accent-700);
 }
-.beta-feedback.is-open .beta-feedback__icon {
-  transform: rotate(180deg);
-}
-.beta-feedback__icon {
-  transition: transform 0.3s ease;
-}
+/* End beta-feedback widget */
 
 /* ---------- Landing ---------- */
 
