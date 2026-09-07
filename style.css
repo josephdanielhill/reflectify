@@ -951,11 +951,25 @@ textarea.input {
 .site-footer {
   padding: var(--space-3) var(--space-4);
   border-top: 2px solid var(--color-divider);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 .site-footer p {
   margin: 0;
   font-size: 11px;
   opacity: 0.7;
+}
+.site-footer__link {
+  font-size: 12px;
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.site-footer__link:hover {
+  text-decoration: underline;
 }
 
 /* ---------- Enhanced topics (BLD-998: reflection + AI read + next steps) ---------- */
