@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reflectify — a suite of reflection tools</title>
-  <meta name="description" content="Pick a reflection tool, get a prompt to run through your favorite AI, then turn its answers into a visual report card you can save as a PDF or image." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪞</text></svg>" />
+  <title>Reflectify — A Suite of Mindful AI Reflection Tools</title>
+  <meta name="description" content="Pick a structured reflection tool, run our guided prompt in your favorite AI, and generate a beautifully designed reflection summary to track your personal growth." />
+  <link rel="icon" href="reflectify-favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="style.css" />
 
   <!-- Fathom - beautiful, simple website analytics -->
@@ -13,34 +13,131 @@
   <!-- / Fathom -->
 </head>
 <body>
-  <div class="nav">
-    <div class="nav-brand">Reflectify <span class="nav-brand__tag">experimental</span></div>
-    <a href="#" id="nav-start-over" class="hidden" data-nav="home">Start over</a>
-  </div>
+  <header class="header-container">
+    <div class="header-brand">
+      <a href="#" class="brand-link" data-nav="home">
+        <svg class="header-brand__logo" width="320" height="72" viewBox="0 0 280 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reflectify">
+          <g transform="translate(4, 4)">
+            <rect x="0" y="0" width="56" height="56" rx="28" fill="#EBF3EF" />
+            <path d="M28 11 C 14 25, 14 39, 28 44 C 42 39, 42 25, 28 11 Z" fill="#2D4A3E" />
+            <path d="M28 19 C 38 26, 38 37, 28 41" stroke="#E8A88A" stroke-width="3.5" stroke-linecap="round" fill="none" />
+          </g>
+          <text x="76" y="44" font-family="var(--font-heading), Georgia, serif" font-weight="500" font-size="38" fill="#2D4A3E" letter-spacing="-0.8">Reflectify</text>
+        </svg>
+      </a>
+    </div>
+    <a href="#" id="nav-start-over" class="btn btn-secondary nav-start-over-btn hidden" data-nav="home">← Start over</a>
+  </header>
 
   <div class="tool-hero hidden" id="tool-hero">
-    <span class="tool-hero__icon" id="tool-hero-icon"></span>
-    <div>
-      <h6 class="tool-hero__eyebrow">Reflecting on</h6>
-      <div class="tool-hero__name" id="tool-hero-name"></div>
+    <div class="tool-hero__inner">
+      <div class="tool-hero__content">
+        <span class="tool-hero__badge" id="tool-hero-badge">
+          <span id="tool-hero-icon" class="tool-hero__icon"></span>
+          <span id="tool-hero-name" class="tool-hero__name"></span>
+        </span>
+        <h1 class="tool-hero__title" id="tool-hero-title">Job Reflection</h1>
+        <p class="tool-hero__desc" id="tool-hero-desc"></p>
+      </div>
+      <div class="tool-hero__media" id="tool-hero-media">
+        <img id="tool-hero-img" src="" alt="Tool banner" class="tool-hero__img" />
+      </div>
     </div>
   </div>
 
   <main>
-    <!-- HOME / LANDING -->
+    <!-- HOME / LANDING PAGE -->
     <section id="view-home" class="view landing">
-      <div class="landing__inner">
-        <h6 class="landing__eyebrow">A suite of reflection tools</h6>
-        <h1 class="landing__title">What do you want to&nbsp;reflect&nbsp;on?</h1>
-        <p class="landing__lede">
-          Pick a tool below. Each one hands you a prompt to run through your favorite AI, then
-          turns its answers into a visual report card you can save as a PDF or image.
-        </p>
-        <div class="tool-grid" id="tool-grid"></div>
+      <!-- HERO LANDING SECTION -->
+      <div class="landing-hero-wrapper">
+        <div class="landing-hero__grid">
+          <div class="landing-hero__text">
+            <span class="landing__eyebrow">Mindful Self-Reflection Tools</span>
+            <h1 class="landing__title">Turn AI conversations into clear personal insights.</h1>
+            <p class="landing__lede">
+              Reflectify provides structured interview prompts for ChatGPT, Claude, and Gemini. 
+              Reflect on your career, goals, or growth, then turn your session into a beautifully designed reflection summary.
+            </p>
+            <div class="landing-hero__ctas">
+              <a href="#tool-grid" class="btn btn-primary btn-lg">Explore Reflection Tools</a>
+              <a href="#how-it-works" class="btn btn-secondary btn-lg">How it works &rarr;</a>
+            </div>
+          </div>
+          <div class="landing-hero__media">
+            <img src="illustration-botanical-environment.jpg" alt="Botanical sanctuary environment illustration" class="landing-hero__img" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-STEP PROCESS SECTION -->
+      <div id="how-it-works" class="landing-process-section">
+        <div class="landing-process__inner">
+          <div class="landing-process__header">
+            <span class="landing__eyebrow">Guided Workflow</span>
+            <h2 class="landing-process__title">Three steps to your personal reflection summary</h2>
+            <p class="landing-process__subtitle">No account or login required. Your private reflection data stays entirely with you.</p>
+          </div>
+
+          <div class="landing-process__grid">
+            <div class="process-card">
+              <div class="process-card__media">
+                <img src="illustration-reflection-path.jpg" alt="Guided interview path" class="process-card__img" />
+              </div>
+              <div class="process-card__body">
+                <span class="process-card__step">Step 1</span>
+                <h3>1. Copy Prompt & Interview</h3>
+                <p>Pick a reflection framework below and paste the generated prompt into ChatGPT, Claude, or Gemini. The AI guides you through a thoughtful Q&A in your language.</p>
+              </div>
+            </div>
+
+            <div class="process-card">
+              <div class="process-card__media">
+                <img src="illustration-growth-harvest.jpg" alt="Growth and insight synthesis" class="process-card__img" />
+              </div>
+              <div class="process-card__body">
+                <span class="process-card__step">Step 2</span>
+                <h3>2. Upload Reflection JSON</h3>
+                <p>At the end of your interview, the AI generates a structured JSON summary. Simply drop or paste the JSON file directly into Reflectify.</p>
+              </div>
+            </div>
+
+            <div class="process-card">
+              <div class="process-card__media">
+                <div class="process-card__placeholder">
+                  <div class="sample-report-card-preview">
+                    <div class="sample-card-badge">78 / 100</div>
+                    <div class="sample-card-title">Senior Product Designer</div>
+                    <div class="sample-card-bars">
+                      <div class="bar" style="width: 82%"></div>
+                      <div class="bar" style="width: 74%"></div>
+                      <div class="bar" style="width: 63%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="process-card__body">
+                <span class="process-card__step">Step 3</span>
+                <h3>3. Generate Reflection Summary</h3>
+                <p>Instantly render an executive-grade reflection summary complete with score breakdowns, skill radar, quotes, and milestone timelines to export or keep.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL SELECTION GRID -->
+      <div class="landing-tools-wrapper">
+        <div class="landing-tools__inner">
+          <div class="landing-tools__header">
+            <span class="landing__eyebrow">Available Frameworks</span>
+            <h2 class="landing-tools__title">Choose a reflection tool to begin</h2>
+          </div>
+          <div class="tool-grid" id="tool-grid"></div>
+        </div>
       </div>
     </section>
 
-    <!-- PROMPT -->
+    <!-- PROMPT VIEW -->
     <section id="view-prompt" class="view step hidden">
       <div class="step__inner">
         <h6 class="step__eyebrow">Step 1 of 3</h6>
@@ -63,9 +160,9 @@
       </div>
     </section>
 
-    <!-- UPLOAD -->
+    <!-- UPLOAD VIEW -->
     <section id="view-upload" class="view step hidden">
-      <div class="step__inner step__inner--narrow" id="upload-panel">
+      <div class="step__inner" id="upload-panel">
         <h6 class="step__eyebrow">Step 2 of 3</h6>
         <h2 class="step__title">Upload your reflection JSON</h2>
         <p class="step__lede">
@@ -88,30 +185,33 @@
         <p id="upload-error" class="upload-panel__error hidden" role="alert"></p>
 
         <div class="upload-panel__sample-wrap">
-          <a href="#" class="upload-panel__sample" id="load-sample-btn">Or just see an example report &rarr;</a>
+          <p class="upload-panel__sample-text">Want to test the reflection summary before reflecting?</p>
+          <button class="btn btn-link" type="button" id="load-sample-btn">Load sample reflection data &rarr;</button>
         </div>
       </div>
     </section>
 
-    <!-- REPORT -->
-    <section id="view-report" class="view report-view hidden">
+    <!-- REPORT CARD VIEW -->
+    <section id="view-report" class="view hidden">
       <div class="report-toolbar">
-        <h6 class="report-toolbar__eyebrow">Step 3 of 3 &mdash; your report card</h6>
-        <div class="report-toolbar__actions">
-          <button class="btn btn-secondary" type="button" id="export-png-btn">Download image</button>
-          <button class="btn btn-primary" type="button" id="export-pdf-btn">Download PDF</button>
-        </div>
+        <button class="btn btn-primary" type="button" id="export-png-btn">Export PNG image</button>
+        <button class="btn btn-secondary" type="button" id="export-pdf-btn">Save as PDF</button>
+        <button class="btn btn-ghost" type="button" data-nav="home">Start another reflection</button>
       </div>
-      <div id="printable-report" class="report-card"></div>
+
+      <div class="report-card-wrap">
+        <article id="report-card" class="report-card">
+          <!-- Dynamically populated by renderReport() in script.js -->
+        </article>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>Runs entirely in your browser. Nothing is uploaded to a server. &middot; <a href="privacy.html">Privacy policy</a></p>
-    <p><a href="https://squarecircletriangle.co/#/triangle-reflectify" target="_blank" rel="noopener">See this project on squarecircletriangle</a></p>
+    <p>&copy; Reflectify &bull; Privacy-focused AI reflection tools</p>
   </footer>
 
   <script src="vendor/html2canvas.min.js"></script>
-  <script type="module" src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
