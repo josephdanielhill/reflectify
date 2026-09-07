@@ -51,6 +51,7 @@ const TOOLS = [
     id: "job-reflection",
     icon: "💼",
     name: "Job Reflection",
+    image: "illustration-job-reflection.jpg",
     description:
       "Interviews you about achievements, regrets, growth and goals from your current job, then hands back a JSON file for a reflection summary.",
     promptTemplate: PROMPT_TEMPLATE,
@@ -164,9 +165,18 @@ function initToolGrid() {
   const grid = document.getElementById("tool-grid");
 
   TOOLS.forEach((tool) => {
+    const cardMedia = tool.image
+      ? h("div", { class: "tool-card__media" }, [
+          h("img", { src: tool.image, alt: tool.name, class: "tool-card__img" }),
+        ])
+      : null;
+
     const main = h("button", { class: "tool-card__main", type: "button" }, [
-      h("div", { class: "tool-card__icon" }, tool.icon),
-      h("h3", { class: "tool-card__title" }, tool.name),
+      cardMedia,
+      h("div", { class: "tool-card__header-line" }, [
+        h("span", { class: "tool-card__icon" }, tool.icon),
+        h("h3", { class: "tool-card__title" }, tool.name),
+      ]),
       h("p", { class: "tool-card__desc" }, tool.description),
       h("span", { class: "tool-card__cta" }, "Start →"),
     ]);
@@ -191,9 +201,16 @@ function initToolGrid() {
 
   grid.appendChild(
     h("div", { class: "tool-card tool-card--placeholder" }, [
-      h("div", { class: "tool-card__icon" }, "✨"),
-      h("h3", { class: "tool-card__title" }, "More tools coming soon"),
-      h("p", { class: "tool-card__desc" }, "Reflectify is growing into a suite of reflection tools beyond the job check-in."),
+      h("div", { class: "tool-card__media" }, [
+        h("img", { src: "illustration-coming-soon.jpg", alt: "More tools coming soon", class: "tool-card__img" }),
+      ]),
+      h("div", { class: "tool-card__placeholder-body" }, [
+        h("div", { class: "tool-card__header-line" }, [
+          h("span", { class: "tool-card__icon" }, "✨"),
+          h("h3", { class: "tool-card__title" }, "More tools coming soon"),
+        ]),
+        h("p", { class: "tool-card__desc" }, "Reflectify is growing into a suite of reflection tools beyond the job check-in."),
+      ]),
     ])
   );
 }
