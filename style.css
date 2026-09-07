@@ -1,55 +1,59 @@
+/* Reflectify — Botanical Editorial design system (PRV-5)
+   Self-hosted variable fonts (Newsreader headings + Inter body) so
+   html2canvas PNG export and PDF print stay reliable (no runtime CDN). */
 @font-face {
-  font-family: "Archivo";
+  font-family: "Newsreader";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 200 800;
   font-display: swap;
-  src: url("vendor/fonts/archivo-latin-400-normal.woff2") format("woff2");
+  src: url("vendor/fonts/newsreader-latin-variable.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Archivo";
+  font-family: "Inter";
   font-style: normal;
-  font-weight: 600;
+  font-weight: 100 900;
   font-display: swap;
-  src: url("vendor/fonts/archivo-latin-600-normal.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Archivo";
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url("vendor/fonts/archivo-latin-800-normal.woff2") format("woff2");
+  src: url("vendor/fonts/inter-latin-variable.woff2") format("woff2");
 }
 
 :root {
-  --color-bg: #f3f2f2;
-  --color-surface: #eae9e9;
-  --color-text: #201e1d;
-  --color-accent: #ec3013;
-  --color-divider: rgba(32, 30, 29, 0.4);
+  /* Palette (PRV-5): moss, sage, eucalyptus, terracotta on sand */
+  --color-bg: #F7F5F0;            /* sand — page + report card */
+  --color-surface: #FFFFFF;        /* crisp white cards */
+  --color-text: #1E2421;           /* charcoal */
+  --color-accent: #2D4A3E;         /* moss — primary action */
+  --color-divider: rgba(30, 36, 33, 0.25);
 
-  --color-neutral-100: #f8f4f4;
-  --color-neutral-200: #eae7e7;
-  --color-neutral-300: #d7d3d3;
-  --color-neutral-400: #bab6b6;
-  --color-neutral-500: #9b9797;
-  --color-neutral-600: #7d7979;
-  --color-neutral-700: #605d5d;
-  --color-neutral-800: #444141;
-  --color-neutral-900: #2d2b2b;
+  --color-neutral-100: #F5F4F0;
+  --color-neutral-200: #E9E7E1;
+  --color-neutral-300: #D8D4CC;
+  --color-neutral-400: #B9B4A9;
+  --color-neutral-500: #978F80;
+  --color-neutral-600: #766F62;
+  --color-neutral-700: #585249;
+  --color-neutral-800: #3C3832;
+  --color-neutral-900: #26231F;
 
-  --color-accent-100: #fff2ef;
-  --color-accent-200: #ffe0d9;
-  --color-accent-300: #ffc4b8;
-  --color-accent-400: #ff9783;
-  --color-accent-500: #ff563c;
-  --color-accent-600: #dd2b0f;
-  --color-accent-700: #ae1800;
-  --color-accent-800: #7c1405;
-  --color-accent-900: #4d170e;
+  --color-accent-100: #EBF3EF;     /* mist */
+  --color-accent-200: #D5E4DC;
+  --color-accent-300: #B3CDBF;
+  --color-accent-400: #8CAE9E;     /* eucalyptus */
+  --color-accent-500: #5F8974;
+  --color-accent-600: #4E7C67;     /* sage — button hover */
+  --color-accent-700: #3A5C4E;     /* moss deeper — button active */
+  --color-accent-800: #2D4A3E;     /* moss */
+  --color-accent-900: #223B31;
 
-  --font-heading: "Archivo", system-ui, sans-serif;
-  --font-heading-weight: 800;
-  --font-body: "Archivo", system-ui, sans-serif;
+  /* Terracotta — warm secondary accent (eyebrows, highlights).
+     #B0523A darkens the design's #C86D51 enough to pass WCAG AA
+     (4.68:1 on sand) for small eyebrow text. */
+  --color-terracotta: #B0523A;
+  --color-terracotta-soft: #E8A88A;
+  --color-terracotta-tint: rgba(200, 109, 81, 0.2);
+
+  --font-heading: "Newsreader", Georgia, serif;
+  --font-heading-weight: 600;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -58,13 +62,13 @@
   --space-6: 24px;
   --space-8: 32px;
 
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
 
-  --shadow-sm: 0 1px 2px rgba(45, 43, 43, 0.14);
-  --shadow-md: 0 3px 10px rgba(45, 43, 43, 0.16);
-  --shadow-lg: 0 12px 32px rgba(45, 43, 43, 0.22);
+  --shadow-sm: 0 1px 2px rgba(30, 36, 33, 0.1);
+  --shadow-md: 0 3px 10px rgba(30, 36, 33, 0.12);
+  --shadow-lg: 0 12px 32px rgba(30, 36, 33, 0.16);
 }
 
 *, *::before, *::after {
@@ -134,7 +138,7 @@ a {
   outline-offset: 2px;
 }
 ::selection {
-  background: rgba(236, 48, 19, 0.3);
+  background: rgba(45, 74, 62, 0.3);
 }
 
 .hidden {
@@ -190,10 +194,10 @@ main {
   border-color: var(--color-divider);
 }
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(32, 30, 29, 0.07);
+  background: rgba(30, 36, 33, 0.07);
 }
 .btn-secondary:active:not(:disabled) {
-  background: rgba(32, 30, 29, 0.14);
+  background: rgba(30, 36, 33, 0.14);
 }
 .btn-block {
   width: 100%;
@@ -206,7 +210,7 @@ main {
   display: block;
   font-size: 12px;
   margin-bottom: 5px;
-  color: rgba(32, 30, 29, 0.7);
+  color: rgba(30, 36, 33, 0.7);
 }
 .input {
   width: 100%;
@@ -221,7 +225,7 @@ main {
   border-radius: var(--radius-md);
 }
 .input:hover {
-  border-color: rgba(32, 30, 29, 0.45);
+  border-color: rgba(30, 36, 33, 0.45);
 }
 .input:focus-visible {
   border-color: var(--color-accent);
@@ -253,6 +257,14 @@ textarea.input {
   font-weight: var(--font-heading-weight);
   font-size: 18px;
   margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.nav-brand__logo {
+  height: 28px;
+  width: auto;
+  display: block;
 }
 .nav-brand__tag {
   color: var(--color-accent);
@@ -284,7 +296,7 @@ textarea.input {
   line-height: 1;
 }
 .tool-hero__eyebrow {
-  color: var(--color-accent);
+  color: var(--color-terracotta);
   margin: 0;
 }
 .tool-hero__name {
@@ -305,7 +317,7 @@ textarea.input {
   width: 100%;
 }
 .landing__eyebrow {
-  color: var(--color-accent);
+  color: var(--color-terracotta);
 }
 .landing__title {
   margin-bottom: var(--space-4);
@@ -420,7 +432,7 @@ textarea.input {
   max-width: 640px;
 }
 .step__eyebrow {
-  color: var(--color-accent);
+  color: var(--color-terracotta);
 }
 .step__title {
   margin-bottom: var(--space-3);
@@ -482,7 +494,7 @@ textarea.input {
   gap: var(--space-2);
 }
 .report-toolbar__eyebrow {
-  color: var(--color-accent);
+  color: var(--color-terracotta);
   margin: 0;
 }
 .report-toolbar__actions {
@@ -786,5 +798,231 @@ textarea.input {
   }
   .report-card__quote {
     font-size: 20px;
+  }
+}
+
+/* PRV-5 Redesign Additions & Landing Layout */
+.brand-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.landing-hero-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+}
+
+.landing-hero__grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.landing-hero__text .landing__title {
+  font-family: var(--font-heading);
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1.08;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+
+.landing-hero__text .landing__lede {
+  font-size: 19px;
+  color: var(--color-neutral-700);
+  line-height: 1.5;
+  margin-bottom: 32px;
+}
+
+.landing-hero__ctas {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.btn-lg {
+  padding: 12px 28px;
+  font-size: 16px;
+  border-radius: 999px;
+}
+
+.landing-hero__media {
+  position: relative;
+}
+
+.landing-hero__img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(45, 74, 62, 0.12);
+  display: block;
+  object-fit: cover;
+}
+
+/* Landing Process Section */
+.landing-process-section {
+  background: #ffffff;
+  border-top: 1px solid rgba(45, 74, 62, 0.1);
+  border-bottom: 1px solid rgba(45, 74, 62, 0.1);
+  padding: 96px 32px;
+  width: 100%;
+}
+
+.landing-process__inner {
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.landing-process__header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.landing-process__title {
+  font-family: var(--font-heading);
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+}
+
+.landing-process__subtitle {
+  font-size: 17px;
+  color: var(--color-neutral-600);
+}
+
+.landing-process__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.process-card {
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(45, 74, 62, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.process-card__media {
+  height: 210px;
+  overflow: hidden;
+  position: relative;
+  background: var(--color-accent-100);
+}
+
+.process-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.process-card__placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.sample-report-card-preview {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(45, 74, 62, 0.12);
+}
+
+.sample-card-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-terracotta);
+  margin-bottom: 4px;
+}
+
+.sample-card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+}
+
+.sample-card-bars .bar {
+  height: 6px;
+  background: var(--color-accent-600);
+  border-radius: 3px;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+.process-card__body {
+  padding: 28px 24px;
+  flex: 1;
+}
+
+.process-card__step {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-terracotta);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.process-card__body h3 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.process-card__body p {
+  font-size: 14px;
+  color: var(--color-neutral-700);
+  margin-bottom: 0;
+  line-height: 1.55;
+}
+
+/* Landing Tools Wrapper */
+.landing-tools-wrapper {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 96px 32px 128px;
+  width: 100%;
+}
+
+.landing-tools__header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.landing-tools__title {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  color: var(--color-accent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .landing-hero__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .landing-process__grid {
+    grid-template-columns: 1fr;
+  }
+  .landing-hero__text .landing__title {
+    font-size: 38px;
   }
 }
