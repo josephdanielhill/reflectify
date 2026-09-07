@@ -1099,27 +1099,24 @@ textarea.input {
   align-items: center;
 }
 
-/* Hero illustration — interactive 3D wobble + glossy sheen.
-   The wrapper is the tilted, clipped frame; the image inside is
-   rotated toward the cursor in JS (smooth eased), and two overlay
-   layers give it a soft, shiny glass finish that tracks the pointer. */
+/* Hero illustration card — interactive 3D wobble + glossy sheen.
+   The whole framed card tilts toward the cursor in JS (smooth eased),
+   so the card and its image move together. Two overlay layers give it
+   a soft, shiny glass finish; the specular highlight tracks the pointer. */
 .landing-hero__media {
   position: relative;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(45, 74, 62, 0.12);
   overflow: hidden;
-  perspective: 900px;
-  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  will-change: transform;
 }
 
 .landing-hero__img {
   width: 100%;
   display: block;
   object-fit: cover;
-  transform-origin: 50% 50%;
-  will-change: transform;
-  transform: scale(1.03);
 }
 
 /* Resting glass sheen — a soft diagonal light band so the flat

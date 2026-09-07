@@ -779,50 +779,61 @@ function initExportButtons() {
 }
 
 // ---------- Hero wobble + glossy sheen ----------
-// Smoothly tilts the landing hero illustration toward the cursor and
-// animates the specular sheen so the image feels alive and glossy.
+// Tilts the whole framed card toward the cursor (smooth eased) and moves
+// the specular highlight across it, so the card reads as a living,
+// glossy surface.
 function initHeroWobble() {
   const frame = document.querySelector(".landing-hero__media");
   if (!frame) return;
-  const img = frame.querySelector(".landing-hero__img");
-  if (!img) return;
 
   // Respect users who prefer reduced motion.
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
   if (reduce.matches) return;
 
-  const MAX_TILT_X = 8; // degrees
-  const MAX_TILT_Y = 8;
+  const MAX_TILT_X = 9; // degrees
+  const MAX_TILT_Y = 11;
   const ROT_SMOOTH = 0.09; // 1 = instant, lower = floatier/wobblier
+  const HIGHLIGHT_SMOOTH = 0.12;
   const RAF = window.requestAnimationFrame.bind(window);
 
-  let current = { x: 0, y: 0 };
-  let target = { x: 0, y: 0 };
+  let current = { x: 0, y: 0, hx: 50, hy: 45 };
+  let target = { x: 0, y: 0, hx: 50, hy: 45 };
   let active = false;
 
   function frameLoop() {
     current.x += (target.x - current.x) * ROT_SMOOTH;
     current.y += (target.y - current.y) * ROT_SMOOTH;
-    apply(current.x, current.y);
-    if (Math.abs(target.x - current.x) > 0.02 || Math.abs(target.y - current.y) > 0.02) {
+    current.hx += (target.hx - current.hx) * HIGHLIGHT_SMOOTH;
+    current.hy += (target.hy - current.hy) * HIGHLIGHT_SMOOTH;
+    apply(current.x, current.y, current.hx, current.hy);
+    if (
+      Math.abs(target.x - current.x) > 0.02 ||
+      Math.abs(target.y - current.y) > 0.02 ||
+      Math.abs(target.hx - current.hx) > 0.05 ||
+      Math.abs(target.hy - current.hy) > 0.05
+    ) {
       RAF(frameLoop);
     } else {
       active = false;
     }
   }
 
-  function apply(rx, ry) {
-    img.style.transform = `perspective(900px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(1.03)`;
+  function apply(rx, ry, hx, hy) {
+    frame.style.transform =
+      `perspective(1000px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+    frame.style.setProperty("--hx", `${hx.toFixed(1)}%`);
+    frame.style.setProperty("--hy", `${hy.toFixed(1)}%`);
   }
 
   frame.addEventListener("pointermove", (e) => {
     const rect = frame.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    // -1..1 from centre; rotate away from cursor so it feels like it leans toward you.
     const px = (e.clientX - rect.left) / rect.width; // 0..1
     const py = (e.clientY - rect.top) / rect.height; // 0..1
     target.y = (px - 0.5) * 2 * MAX_TILT_Y; // rotateY
     target.x = (0.5 - py) * 2 * MAX_TILT_X; // rotateX
+    target.hx = px * 100; // sheen follows cursor across the card
+    target.hy = py * 100;
     frame.classList.add("hero-hover");
     if (!active) {
       active = true;
@@ -833,6 +844,8 @@ function initHeroWobble() {
   frame.addEventListener("pointerleave", () => {
     target.x = 0;
     target.y = 0;
+    target.hx = 50;
+    target.hy = 45;
     frame.classList.remove("hero-hover");
     if (!active) {
       active = true;
