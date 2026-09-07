@@ -1801,6 +1801,87 @@ textarea.input {
   color: var(--color-accent);
 }
 
+/* ---------- Why I built this ---------- */
+.landing-about-wrapper {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 32px 128px;
+  width: 100%;
+}
+
+.landing-about {
+  background: #ffffff;
+  border: 1px solid rgba(45, 74, 62, 0.12);
+  border-radius: 32px;
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 48px;
+  align-items: center;
+  padding: 56px 64px;
+}
+
+.landing-about__media {
+  display: flex;
+  justify-content: center;
+}
+
+.landing-about__avatar-wrap {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--color-accent-200);
+  box-shadow: var(--shadow-md);
+}
+
+.landing-about__avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.landing-about__body .landing__eyebrow {
+  margin-bottom: 12px;
+}
+
+.landing-about__title {
+  font-family: var(--font-heading);
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--color-accent-900);
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+}
+
+.landing-about__lede {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--color-neutral-700);
+  margin: 0 0 12px;
+}
+.landing-about__lede:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .landing-about {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 40px 28px;
+    text-align: center;
+  }
+  .landing-about__body .landing__eyebrow {
+    text-align: center;
+  }
+  .landing-about__avatar-wrap {
+    width: 200px;
+    height: 200px;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 900px) {
   .landing-hero__grid {
