@@ -800,3 +800,229 @@ textarea.input {
     font-size: 20px;
   }
 }
+
+/* PRV-5 Redesign Additions & Landing Layout */
+.brand-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.landing-hero-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+}
+
+.landing-hero__grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.landing-hero__text .landing__title {
+  font-family: var(--font-heading);
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1.08;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+
+.landing-hero__text .landing__lede {
+  font-size: 19px;
+  color: var(--color-neutral-700);
+  line-height: 1.5;
+  margin-bottom: 32px;
+}
+
+.landing-hero__ctas {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.btn-lg {
+  padding: 12px 28px;
+  font-size: 16px;
+  border-radius: 999px;
+}
+
+.landing-hero__media {
+  position: relative;
+}
+
+.landing-hero__img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(45, 74, 62, 0.12);
+  display: block;
+  object-fit: cover;
+}
+
+/* Landing Process Section */
+.landing-process-section {
+  background: #ffffff;
+  border-top: 1px solid rgba(45, 74, 62, 0.1);
+  border-bottom: 1px solid rgba(45, 74, 62, 0.1);
+  padding: 96px 32px;
+  width: 100%;
+}
+
+.landing-process__inner {
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.landing-process__header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.landing-process__title {
+  font-family: var(--font-heading);
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+}
+
+.landing-process__subtitle {
+  font-size: 17px;
+  color: var(--color-neutral-600);
+}
+
+.landing-process__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.process-card {
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(45, 74, 62, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.process-card__media {
+  height: 210px;
+  overflow: hidden;
+  position: relative;
+  background: var(--color-accent-100);
+}
+
+.process-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.process-card__placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.sample-report-card-preview {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(45, 74, 62, 0.12);
+}
+
+.sample-card-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-terracotta);
+  margin-bottom: 4px;
+}
+
+.sample-card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+}
+
+.sample-card-bars .bar {
+  height: 6px;
+  background: var(--color-accent-600);
+  border-radius: 3px;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+.process-card__body {
+  padding: 28px 24px;
+  flex: 1;
+}
+
+.process-card__step {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-terracotta);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.process-card__body h3 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.process-card__body p {
+  font-size: 14px;
+  color: var(--color-neutral-700);
+  margin-bottom: 0;
+  line-height: 1.55;
+}
+
+/* Landing Tools Wrapper */
+.landing-tools-wrapper {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 96px 32px 128px;
+  width: 100%;
+}
+
+.landing-tools__header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.landing-tools__title {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  color: var(--color-accent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .landing-hero__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .landing-process__grid {
+    grid-template-columns: 1fr;
+  }
+  .landing-hero__text .landing__title {
+    font-size: 38px;
+  }
+}

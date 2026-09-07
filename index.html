@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reflectify — a suite of reflection tools</title>
-  <meta name="description" content="Pick a reflection tool, get a prompt to run through your favorite AI, then turn its answers into a visual report card you can save as a PDF or image." />
+  <title>Reflectify — A Suite of Mindful AI Reflection Tools</title>
+  <meta name="description" content="Pick a structured reflection tool, run our guided prompt in your favorite AI, and generate a beautifully designed visual report card to track your personal growth." />
   <link rel="icon" href="reflectify-favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="style.css" />
 
@@ -15,14 +15,16 @@
 <body>
   <div class="nav">
     <div class="nav-brand">
-      <svg class="nav-brand__logo" width="240" height="60" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reflectify">
-        <g transform="translate(10, 10)">
-          <rect x="0" y="0" width="40" height="40" rx="20" fill="#EBF3EF" />
-          <path d="M20 8 C 10 18, 10 28, 20 34 C 30 28, 30 18, 20 8 Z" fill="#2D4A3E" />
-          <path d="M20 14 C 27 19, 27 27, 20 31" stroke="#E8A88A" stroke-width="2.5" stroke-linecap="round" fill="none" />
-        </g>
-        <text x="62" y="38" font-family="var(--font-heading), Georgia, serif" font-weight="500" font-size="28" fill="#2D4A3E" letter-spacing="-0.5">Reflectify</text>
-      </svg>
+      <a href="#" class="brand-link" data-nav="home">
+        <svg class="nav-brand__logo" width="220" height="50" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reflectify">
+          <g transform="translate(10, 10)">
+            <rect x="0" y="0" width="40" height="40" rx="20" fill="#EBF3EF" />
+            <path d="M20 8 C 10 18, 10 28, 20 34 C 30 28, 30 18, 20 8 Z" fill="#2D4A3E" />
+            <path d="M20 14 C 27 19, 27 27, 20 31" stroke="#E8A88A" stroke-width="2.5" stroke-linecap="round" fill="none" />
+          </g>
+          <text x="62" y="38" font-family="var(--font-heading), Georgia, serif" font-weight="500" font-size="28" fill="#2D4A3E" letter-spacing="-0.5">Reflectify</text>
+        </svg>
+      </a>
       <span class="nav-brand__tag">experimental</span>
     </div>
     <a href="#" id="nav-start-over" class="hidden" data-nav="home">Start over</a>
@@ -37,20 +39,98 @@
   </div>
 
   <main>
-    <!-- HOME / LANDING -->
+    <!-- HOME / LANDING PAGE -->
     <section id="view-home" class="view landing">
-      <div class="landing__inner">
-        <h6 class="landing__eyebrow">A suite of reflection tools</h6>
-        <h1 class="landing__title">What do you want to&nbsp;reflect&nbsp;on?</h1>
-        <p class="landing__lede">
-          Pick a tool below. Each one hands you a prompt to run through your favorite AI, then
-          turns its answers into a visual report card you can save as a PDF or image.
-        </p>
-        <div class="tool-grid" id="tool-grid"></div>
+      <!-- HERO LANDING SECTION -->
+      <div class="landing-hero-wrapper">
+        <div class="landing-hero__grid">
+          <div class="landing-hero__text">
+            <span class="landing__eyebrow">Mindful Self-Reflection Tools</span>
+            <h1 class="landing__title">Turn AI conversations into clear personal insights.</h1>
+            <p class="landing__lede">
+              Reflectify provides structured interview prompts for ChatGPT, Claude, and Gemini. 
+              Reflect on your career, goals, or growth, then turn your session into a beautifully designed visual report card.
+            </p>
+            <div class="landing-hero__ctas">
+              <a href="#tool-grid" class="btn btn-primary btn-lg">Explore Reflection Tools</a>
+              <a href="#how-it-works" class="btn btn-secondary btn-lg">How it works &rarr;</a>
+            </div>
+          </div>
+          <div class="landing-hero__media">
+            <img src="illustration-botanical-environment.jpg" alt="Botanical sanctuary environment illustration" class="landing-hero__img" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-STEP PROCESS SECTION -->
+      <div id="how-it-works" class="landing-process-section">
+        <div class="landing-process__inner">
+          <div class="landing-process__header">
+            <span class="landing__eyebrow">Guided Workflow</span>
+            <h2 class="landing-process__title">Three steps to your personal report card</h2>
+            <p class="landing-process__subtitle">No account or login required. Your private reflection data stays entirely with you.</p>
+          </div>
+
+          <div class="landing-process__grid">
+            <div class="process-card">
+              <div class="process-card__media">
+                <img src="illustration-reflection-path.jpg" alt="Guided interview path" class="process-card__img" />
+              </div>
+              <div class="process-card__body">
+                <span class="process-card__step">Step 1</span>
+                <h3>1. Copy Prompt & Interview</h3>
+                <p>Pick a reflection framework below and paste the generated prompt into ChatGPT, Claude, or Gemini. The AI guides you through a thoughtful Q&A in your language.</p>
+              </div>
+            </div>
+
+            <div class="process-card">
+              <div class="process-card__media">
+                <img src="illustration-growth-harvest.jpg" alt="Growth and insight synthesis" class="process-card__img" />
+              </div>
+              <div class="process-card__body">
+                <span class="process-card__step">Step 2</span>
+                <h3>2. Upload Reflection JSON</h3>
+                <p>At the end of your interview, the AI generates a structured JSON summary. Simply drop or paste the JSON file directly into Reflectify.</p>
+              </div>
+            </div>
+
+            <div class="process-card">
+              <div class="process-card__media">
+                <div class="process-card__placeholder">
+                  <div class="sample-report-card-preview">
+                    <div class="sample-card-badge">78 / 100</div>
+                    <div class="sample-card-title">Senior Product Designer</div>
+                    <div class="sample-card-bars">
+                      <div class="bar" style="width: 82%"></div>
+                      <div class="bar" style="width: 74%"></div>
+                      <div class="bar" style="width: 63%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="process-card__body">
+                <span class="process-card__step">Step 3</span>
+                <h3>3. Generate Report Card</h3>
+                <p>Instantly render an executive-grade visual report card complete with score breakdowns, skill radar, quotes, and milestone timelines to export or keep.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL SELECTION GRID -->
+      <div class="landing-tools-wrapper">
+        <div class="landing-tools__inner">
+          <div class="landing-tools__header">
+            <span class="landing__eyebrow">Available Frameworks</span>
+            <h2 class="landing-tools__title">Choose a reflection tool to begin</h2>
+          </div>
+          <div class="tool-grid" id="tool-grid"></div>
+        </div>
       </div>
     </section>
 
-    <!-- PROMPT -->
+    <!-- PROMPT VIEW -->
     <section id="view-prompt" class="view step hidden">
       <div class="step__inner">
         <h6 class="step__eyebrow">Step 1 of 3</h6>
@@ -73,7 +153,7 @@
       </div>
     </section>
 
-    <!-- UPLOAD -->
+    <!-- UPLOAD VIEW -->
     <section id="view-upload" class="view step hidden">
       <div class="step__inner step__inner--narrow" id="upload-panel">
         <h6 class="step__eyebrow">Step 2 of 3</h6>
@@ -98,30 +178,112 @@
         <p id="upload-error" class="upload-panel__error hidden" role="alert"></p>
 
         <div class="upload-panel__sample-wrap">
-          <a href="#" class="upload-panel__sample" id="load-sample-btn">Or just see an example report &rarr;</a>
+          <p class="upload-panel__sample-text">Want to test the visual report card before reflecting?</p>
+          <button class="btn btn-link" type="button" id="load-sample-btn">Load sample reflection data &rarr;</button>
         </div>
       </div>
     </section>
 
-    <!-- REPORT -->
-    <section id="view-report" class="view report-view hidden">
+    <!-- REPORT CARD VIEW -->
+    <section id="view-report" class="view hidden">
       <div class="report-toolbar">
-        <h6 class="report-toolbar__eyebrow">Step 3 of 3 &mdash; your report card</h6>
-        <div class="report-toolbar__actions">
-          <button class="btn btn-secondary" type="button" id="export-png-btn">Download image</button>
-          <button class="btn btn-primary" type="button" id="export-pdf-btn">Download PDF</button>
-        </div>
+        <button class="btn btn-primary" type="button" id="export-png-btn">Export PNG image</button>
+        <button class="btn btn-secondary" type="button" id="export-pdf-btn">Save as PDF</button>
+        <button class="btn btn-ghost" type="button" data-nav="home">Start another reflection</button>
       </div>
-      <div id="printable-report" class="report-card"></div>
+
+      <div class="report-card-wrap">
+        <article id="report-card" class="report-card">
+          <header class="report-header">
+            <div class="report-header__brand">
+              <svg width="180" height="40" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(10, 10)">
+                  <rect x="0" y="0" width="40" height="40" rx="20" fill="#EBF3EF" />
+                  <path d="M20 8 C 10 18, 10 28, 20 34 C 30 28, 30 18, 20 8 Z" fill="#2D4A3E" />
+                  <path d="M20 14 C 27 19, 27 27, 20 31" stroke="#E8A88A" stroke-width="2.5" stroke-linecap="round" fill="none" />
+                </g>
+                <text x="62" y="38" font-family="Newsreader, Georgia, serif" font-weight="500" font-size="28" fill="#2D4A3E" letter-spacing="-0.5">Reflectify</text>
+              </svg>
+            </div>
+            <div class="report-header__meta">
+              <span id="report-job-title" class="report-header__title">Job Title</span>
+              <span id="report-period" class="report-header__period">6 Months Reflection</span>
+            </div>
+          </header>
+
+          <div class="report-hero">
+            <div class="report-score">
+              <div id="report-score-num" class="report-score__num">--</div>
+              <div class="report-score__label">Overall Assessment</div>
+            </div>
+            <div class="report-summary">
+              <h2 id="report-headline" class="report-summary__headline"></h2>
+              <p id="report-body" class="report-summary__body"></p>
+            </div>
+          </div>
+
+          <div class="report-grid">
+            <div class="report-col">
+              <section class="report-block">
+                <h3 class="report-block__title">Key Achievements</h3>
+                <div id="report-achievements" class="report-list"></div>
+                <p id="report-achievements-analysis" class="report-analysis"></p>
+              </section>
+
+              <section class="report-block">
+                <h3 class="report-block__title">Regrets & Missed Opportunities</h3>
+                <div id="report-regrets" class="report-list"></div>
+                <p id="report-regrets-analysis" class="report-analysis"></p>
+              </section>
+
+              <section class="report-block">
+                <h3 class="report-block__title">Goals & Next Steps</h3>
+                <div id="report-goals" class="report-list"></div>
+                <p id="report-goals-analysis" class="report-analysis"></p>
+              </section>
+            </div>
+
+            <div class="report-col">
+              <section class="report-block">
+                <h3 class="report-block__title">Skill Growth</h3>
+                <div id="report-skills" class="report-skills"></div>
+                <p id="report-skills-analysis" class="report-analysis"></p>
+              </section>
+
+              <section class="report-block">
+                <h3 class="report-block__title">Timeline Milestones</h3>
+                <div id="report-timeline" class="report-timeline"></div>
+              </section>
+
+              <section class="report-block">
+                <h3 class="report-block__title">In Your Words</h3>
+                <blockquote id="report-quotes" class="report-quotes"></blockquote>
+              </section>
+
+              <div id="report-wellbeing-wrap" class="report-block report-block--callout hidden">
+                <h3 class="report-block__title">Wellbeing & Energy</h3>
+                <div class="wellbeing-stat">
+                  <span id="report-wellbeing-score" class="wellbeing-stat__num">--</span>
+                  <span id="report-wellbeing-note" class="wellbeing-stat__note"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="report-footer">
+            <div id="report-conclusion" class="report-conclusion"></div>
+            <div class="report-footer__tag">Generated with Reflectify &bull; reflectify.io</div>
+          </footer>
+        </article>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>Runs entirely in your browser. Nothing is uploaded to a server. &middot; <a href="privacy.html">Privacy policy</a></p>
-    <p><a href="https://squarecircletriangle.co/#/triangle-reflectify" target="_blank" rel="noopener">See this project on squarecircletriangle</a></p>
+    <p>&copy; Reflectify &bull; Privacy-focused AI reflection tools</p>
   </footer>
 
   <script src="vendor/html2canvas.min.js"></script>
-  <script type="module" src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
