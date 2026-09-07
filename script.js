@@ -52,7 +52,7 @@ const TOOLS = [
     icon: "💼",
     name: "Job Reflection",
     description:
-      "Interviews you about achievements, regrets, growth and goals from your current job, then hands back a JSON file for a visual report card.",
+      "Interviews you about achievements, regrets, growth and goals from your current job, then hands back a JSON file for a reflection summary.",
     promptTemplate: PROMPT_TEMPLATE,
   },
 ];
