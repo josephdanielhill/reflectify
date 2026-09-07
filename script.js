@@ -531,7 +531,7 @@ function normalizeReport(obj) {
 // ---------- Report rendering ----------
 
 function renderReport(report) {
-  const root = document.getElementById("printable-report");
+  const root = document.getElementById("report-card") || document.getElementById("printable-report");
   root.innerHTML = "";
   const grade = gradeFor(report.overallScore);
   const periodLabel = `${report.periodMonths}-month reflection`;
@@ -558,14 +558,28 @@ function renderReport(report) {
 
 function renderHeader(report, grade, periodLabel) {
   return h("div", { class: "report-card__header" }, [
-    h("div", {}, [
-      h("h6", { class: "report-card__label" }, periodLabel),
-      h("h1", { class: "report-card__title" }, report.jobTitle),
-      h("p", { class: "report-card__headline" }, report.headline),
+    h("div", { class: "report-card__header-top" }, [
+      h("div", { class: "report-card__brand" }, [
+        h("svg", { class: "report-card__brand-logo", width: "220", height: "50", viewBox: "0 0 240 60", fill: "none", xmlns: "http://www.w3.org/2000/svg", role: "img", "aria-label": "Reflectify" }, [
+          h("g", { transform: "translate(4, 4)" }, [
+            h("rect", { x: "0", y: "0", width: "52", height: "56", rx: "28", fill: "#EBF3EF" }),
+            h("path", { d: "M26 11 C 12 25, 14 39, 26 44 C 40 39, 40 25, 26 11 Z", fill: "#2D4A3E" }),
+            h("path", { d: "M26 19 C 36 26, 36 37, 26 41", stroke: "#E8A88A", "stroke-width": "3.5", "stroke-linecap": "round", fill: "none" }),
+          ]),
+          h("text", { x: "72", y: "42", "font-family": "var(--font-heading), Georgia, serif", "font-weight": "500", "font-size": "34", fill: "#2D4A3E", "letter-spacing": "-0.8" }, "Reflectify"),
+        ]),
+      ]),
+      h("span", { class: "report-card__period-badge" }, periodLabel),
     ]),
-    h("div", { class: "report-card__grade" }, [
-      h("div", { class: "report-card__grade-value" }, grade),
-      h("div", { class: "report-card__grade-caption" }, "overall grade"),
+    h("div", { class: "report-card__header-main" }, [
+      h("div", { class: "report-card__title-group" }, [
+        h("h1", { class: "report-card__title" }, report.jobTitle),
+        h("p", { class: "report-card__headline" }, report.headline),
+      ]),
+      h("div", { class: "report-card__grade" }, [
+        h("div", { class: "report-card__grade-value" }, grade),
+        h("div", { class: "report-card__grade-caption" }, "overall assessment"),
+      ]),
     ]),
   ]);
 }
@@ -705,15 +719,16 @@ function filenameFor(extension) {
 }
 
 function reportBackgroundColor() {
-  const value = getComputedStyle(document.getElementById("printable-report")).backgroundColor;
-  return value && value !== "rgba(0, 0, 0, 0)" ? value : "#f3f2f2";
+  const el = document.getElementById("report-card") || document.getElementById("printable-report");
+  const value = getComputedStyle(el).backgroundColor;
+  return value && value !== "rgba(0, 0, 0, 0)" ? value : "#EBF3EF";
 }
 
 async function captureReportCanvas() {
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
-  const root = document.getElementById("printable-report");
+  const root = document.getElementById("report-card") || document.getElementById("printable-report");
   return window.html2canvas(root, {
     scale: 2,
     backgroundColor: reportBackgroundColor(),
