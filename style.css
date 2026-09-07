@@ -540,9 +540,6 @@ textarea.input {
   width: 100%;
   margin: 0 auto;
 }
-.step__inner--narrow {
-  max-width: 720px;
-}
 .step__eyebrow {
   display: inline-block;
   color: var(--color-terracotta);
