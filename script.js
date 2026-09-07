@@ -560,13 +560,13 @@ function renderHeader(report, grade, periodLabel) {
   return h("div", { class: "report-card__header" }, [
     h("div", { class: "report-card__header-top" }, [
       h("div", { class: "report-card__brand" }, [
-        h("svg", { class: "report-card__brand-logo", width: "220", height: "50", viewBox: "0 0 240 60", fill: "none", xmlns: "http://www.w3.org/2000/svg", role: "img", "aria-label": "Reflectify" }, [
+        h("svg", { class: "report-card__brand-logo", width: "240", height: "56", viewBox: "0 0 280 64", fill: "none", xmlns: "http://www.w3.org/2000/svg", role: "img", "aria-label": "Reflectify" }, [
           h("g", { transform: "translate(4, 4)" }, [
-            h("rect", { x: "0", y: "0", width: "52", height: "56", rx: "28", fill: "#EBF3EF" }),
-            h("path", { d: "M26 11 C 12 25, 14 39, 26 44 C 40 39, 40 25, 26 11 Z", fill: "#2D4A3E" }),
-            h("path", { d: "M26 19 C 36 26, 36 37, 26 41", stroke: "#E8A88A", "stroke-width": "3.5", "stroke-linecap": "round", fill: "none" }),
+            h("rect", { x: "0", y: "0", width: "56", height: "56", rx: "28", fill: "#EBF3EF" }),
+            h("path", { d: "M28 11 C 14 25, 14 39, 28 44 C 42 39, 42 25, 28 11 Z", fill: "#2D4A3E" }),
+            h("path", { d: "M28 19 C 38 26, 38 37, 28 41", stroke: "#E8A88A", "stroke-width": "3.5", "stroke-linecap": "round", fill: "none" }),
           ]),
-          h("text", { x: "72", y: "42", "font-family": "var(--font-heading), Georgia, serif", "font-weight": "500", "font-size": "34", fill: "#2D4A3E", "letter-spacing": "-0.8" }, "Reflectify"),
+          h("text", { x: "76", y: "44", "font-family": "Newsreader, Georgia, serif", "font-weight": "500", "font-size": "38", fill: "#2D4A3E", "letter-spacing": "-0.8" }, "Reflectify"),
         ]),
       ]),
       h("span", { class: "report-card__period-badge" }, periodLabel),
