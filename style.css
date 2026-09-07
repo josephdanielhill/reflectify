@@ -163,18 +163,20 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
   text-decoration: none;
-  font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
-  font-size: 13px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
   line-height: 1.2;
-  color: var(--color-text);
+  color: var(--color-accent);
   background: transparent;
   border: 1px solid transparent;
-  padding: calc(var(--space-2) * 0.85) var(--space-3);
-  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 .btn:disabled {
   opacity: 0.45;
@@ -182,28 +184,60 @@ main {
 }
 .btn-primary {
   background: var(--color-accent);
-  color: var(--color-bg);
+  color: #ffffff;
 }
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-accent-600);
+  background: #1f332c;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 .btn-primary:active:not(:disabled) {
-  background: var(--color-accent-700);
+  background: #16241e;
+  transform: translateY(0);
 }
 .btn-secondary {
-  border-color: var(--color-divider);
+  background: #ffffff;
+  border-color: rgba(45, 74, 62, 0.25);
+  color: var(--color-accent);
 }
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(30, 36, 33, 0.07);
+  background: var(--color-mint-light);
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
 }
 .btn-secondary:active:not(:disabled) {
-  background: rgba(30, 36, 33, 0.14);
+  background: rgba(45, 74, 62, 0.1);
+  transform: translateY(0);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--color-accent);
+  border-color: transparent;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-mint-light);
+  color: var(--color-accent);
+}
+.btn-link {
+  background: transparent;
+  color: var(--color-terracotta);
+  padding: 0;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.btn-link:hover:not(:disabled) {
+  color: #c86d51;
 }
 .btn-block {
   width: 100%;
   margin-top: var(--space-2);
-  justify-content: flex-start;
-  text-align: left;
+  justify-content: center;
+  text-align: center;
+}
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 16px;
 }
 
 .field > label {
@@ -1060,12 +1094,6 @@ textarea.input {
   display: flex;
   gap: 16px;
   align-items: center;
-}
-
-.btn-lg {
-  padding: 12px 28px;
-  font-size: 16px;
-  border-radius: 999px;
 }
 
 .landing-hero__media {
