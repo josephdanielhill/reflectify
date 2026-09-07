@@ -1116,6 +1116,59 @@ function initHeroWobble() {
   });
 }
 
+// ---------- About avatar wobble ----------
+// Gives the circular creator avatar the same gentle cursor-following tilt
+// as the hero image, so it feels alive as you move over it.
+function initAvatarWobble() {
+  const frame = document.querySelector("#about-avatar");
+  if (!frame) return;
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (reduce.matches) return;
+
+  const MAX_TILT_X = 10; // degrees
+  const MAX_TILT_Y = 10;
+  const ROT_SMOOTH = 0.09;
+  const RAF = window.requestAnimationFrame.bind(window);
+
+  let current = { x: 0, y: 0 };
+  let target = { x: 0, y: 0 };
+  let active = false;
+
+  function frameLoop() {
+    current.x += (target.x - current.x) * ROT_SMOOTH;
+    current.y += (target.y - current.y) * ROT_SMOOTH;
+    frame.style.transform =
+      `perspective(800px) rotateX(${current.x.toFixed(2)}deg) rotateY(${current.y.toFixed(2)}deg)`;
+    if (Math.abs(target.x - current.x) > 0.02 || Math.abs(target.y - current.y) > 0.02) {
+      RAF(frameLoop);
+    } else {
+      active = false;
+    }
+  }
+
+  function start(targetX, targetY) {
+    target.x = targetX;
+    target.y = targetY;
+    if (!active) {
+      active = true;
+      RAF(frameLoop);
+    }
+  }
+
+  frame.addEventListener("pointermove", (e) => {
+    const rect = frame.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const px = (e.clientX - rect.left) / rect.width; // 0..1
+    const py = (e.clientY - rect.top) / rect.height; // 0..1
+    start((0.5 - py) * 2 * MAX_TILT_X, (px - 0.5) * 2 * MAX_TILT_Y);
+  });
+
+  frame.addEventListener("pointerleave", () => {
+    start(0, 0);
+  });
+}
+
 // ---------- Beta feedback floating widget ----------
 // Toggles the floating beta-feedback panel open/closed on button press,
 // and dismisses it when clicking outside or pressing Escape.
@@ -1153,5 +1206,6 @@ initPromptView();
 initUploadView();
 initExportButtons();
 initHeroWobble();
+initAvatarWobble();
 initBetaFeedback();
 showView("home");
