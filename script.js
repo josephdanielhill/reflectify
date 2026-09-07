@@ -23,26 +23,33 @@ When the interview is complete, respond with ONLY a single JSON code block (no o
   "overallScore": number, // 0-100, your holistic assessment of how the period went
   "headline": "string", // one punchy sentence summing up the period
   "summary": "string", // 2-4 sentence summary
-  "achievements": [{ "title": "string", "detail": "string" }],
+  "summaryBullets": ["string"], // 3-5 short scannable bullet points distilling the most important takeaways from the whole period
+  "achievements": [{ "title": "string", "detail": "string", "quote": "string" }], // quote is an optional verbatim first-person line from my answer that supports this item
   "achievementsAnalysis": "string", // 2-3 sentences analyzing the pattern across my achievements - what they reveal about me
-  "regrets": [{ "title": "string", "detail": "string" }],
+  "achievementSuggestions": ["string"], // 2-3 personalized actions to build on these strengths
+  "challenges": [{ "title": "string", "detail": "string", "quote": "string" }], // the challenges I described facing and how I handled them
+  "challengesAnalysis": "string", // 2-3 sentences on the pattern in how I handled challenges
+  "regrets": [{ "title": "string", "detail": "string", "quote": "string" }],
   "regretsAnalysis": "string", // 2-3 sentences analyzing the pattern across my regrets
+  "regretSuggestions": ["string"], // 2-3 personalized actions to avoid repeating the same pattern
   "skills": [{ "name": "string", "level": number }], // 0-100
   "skillsAnalysis": "string", // 2-3 sentences on what my skill growth (or stagnation) suggests
-  "timeline": [{ "label": "string", "detail": "string" }], // chronological milestones across the period
-  "quotes": ["string"], // 2-4 short first-person quotes pulled from my answers, verbatim where possible
-  "goals": [{ "title": "string", "detail": "string" }],
+  "skillDirections": [{ "role": "string", "reason": "string" }], // 2-3 role directions that fit my strongest demonstrated skills (e.g. a visual-design strength -> UI/product roles), each with a one-line reason grounded in my answers
+  "quotes": [{ "section": "string", "text": "string" }], // 3-6 short first-person quotes pulled verbatim from my answers, each tagged with the section it belongs to (one of: achievements, challenges, regrets, skills, goals, wellbeing). Use quotes[].section and quotes[].text
+  "goals": [{ "title": "string", "detail": "string", "measure": "string", "suggestion": "string", "quote": "string" }], // measure = how I'll know the goal is met; suggestion = a personalized action to help reach it
   "goalsAnalysis": "string", // 2-3 sentences on whether these goals address what came up in the interview
-  "wellbeing": { "score": number, "note": "string" }, // optional, include if we discussed it
+  "wellbeing": { "score": number, "note": "string", "suggestions": ["string"] }, // suggestions = 2-3 personalized actions to protect or raise my energy; optional
   "sentiment": {
     "label": "string", // one or two words, e.g. "Mostly positive", "Mixed", "Strained"
     "score": number, // -100 (very negative) to 100 (very positive), your read of my overall tone across all answers
-    "note": "string" // one sentence on what drives that read
+    "note": "string", // one sentence on what drives that read
+    "positives": ["string"], // 2-3 things that genuinely landed well across the period (signal of what to keep doing)
+    "improvements": ["string"] // 2-3 specific areas that need attention (signal of what to improve)
   },
   "conclusion": "string" // 2-3 sentence closing reflection tying the period together and pointing forward
 }
 
-Base every analysis field on genuine patterns in my actual answers, not generic advice. Before writing the final JSON, review each analysis field (achievementsAnalysis, regretsAnalysis, skillsAnalysis, goalsAnalysis, sentiment.note, conclusion) and confirm it references a specific detail from my answers rather than a generic observation that could apply to anyone; rewrite any field that fails this check.
+Base every analysis field on genuine patterns in my actual answers, not generic advice. Before writing the final JSON, review each analysis field (achievementsAnalysis, challengesAnalysis, regretsAnalysis, skillsAnalysis, goalsAnalysis, sentiment.note, conclusion) and confirm it references a specific detail from my answers rather than a generic observation that could apply to anyone; rewrite any field that fails this check.
 
 Save that JSON as a .json file (for example reflection.json) so I can upload it to my reflection report tool.`;
 
@@ -64,16 +71,34 @@ const SAMPLE_REPORT = {
   overallScore: 78,
   headline: "A period of real growth, with a launch you're proud of and a few boundaries you're still learning to hold.",
   summary: "You shipped the redesign you'd been pushing for a year, grew into a more senior voice in critiques, and started saying no to work that wasn't yours to own. The cost was a stretch in spring where the hours crept up.",
+  summaryBullets: [
+    "Shipped the checkout redesign end to end - conversion up 12%",
+    "Grew into a more senior voice in critiques",
+    "Delegation still lags; the spring crunch pushed hours up",
+  ],
   achievements: [
-    { title: "Shipped the checkout redesign", detail: "Led it end to end, from research through a phased rollout. Conversion is up 12%." },
+    { title: "Shipped the checkout redesign", detail: "Led it end to end, from research through a phased rollout. Conversion is up 12%.", quote: "I finally understand why the old checkout kept losing people, and I actually fixed it." },
     { title: "Mentored two junior designers", detail: "Set up a weekly critique that's stuck even without you running it." },
   ],
   achievementsAnalysis: "Both wins came from you taking ownership beyond your job description - running a project end to end and building a ritual that outlasted your direct involvement. You do your best work when you're trusted with the whole picture, not just a slice of it.",
+  achievementSuggestions: [
+    "Take the next project no one is asking you to own - that's where you grow fastest.",
+    "Write down the critique structure so the next mentor can pick it up and run with it.",
+  ],
+  challenges: [
+    { title: "Managing an unplanned Q2 workload", detail: "Two projects collided and pushed hours up across spring.", quote: "I kept saying yes because I didn't want to seem like I couldn't handle it." },
+    { title: "Giving a teammate hard feedback", detail: "Sat on it for months rather than raising it in week one." },
+  ],
+  challengesAnalysis: "Both challenges share a root: avoiding short-term friction at a longer-term cost. When you did finally name things - the scope and the feedback - they resolved, which suggests the friction you feared was smaller than the cost of delay.",
   regrets: [
     { title: "Said yes to too much in Q2", detail: "Took on a second project without pushing back, which flattened your best quarter." },
     { title: "Delayed a hard conversation", detail: "Sat on feedback for a teammate for months when it needed to happen in week one." },
   ],
   regretsAnalysis: "Both regrets trace back to the same instinct: avoiding friction in the moment, even when you could see the cost coming. That's worth naming directly rather than treating as two separate incidents.",
+  regretSuggestions: [
+    "Practice a 'not right now' script for scope that lands before you're in too deep.",
+    "Put a two-week cap on any difficult feedback you're holding.",
+  ],
   skills: [
     { name: "Systems thinking", level: 82 },
     { name: "Stakeholder communication", level: 74 },
@@ -81,23 +106,28 @@ const SAMPLE_REPORT = {
     { name: "Motion design", level: 63 },
   ],
   skillsAnalysis: "Delegation is the clear outlier against otherwise strong growth - consistent with the regret about taking on too much. It's less a skill gap than a permission gap.",
-  timeline: [
-    { label: "Month 1-2", detail: "Kicked off checkout research, early prototypes." },
-    { label: "Month 3", detail: "Took on a second, unplanned project." },
-    { label: "Month 4-5", detail: "Crunch period; redesign moved to build." },
-    { label: "Month 6", detail: "Redesign shipped; started mentoring formally." },
+  skillDirections: [
+    { role: "Design lead / Staff designer", reason: "Your systems thinking and stakeholder communication already carry a senior cross-functional voice." },
+    { role: "Product design roles on complex flows", reason: "The checkout win shows you thrive on untangling high-stakes, multi-step experiences." },
   ],
   quotes: [
-    "I think I finally understand why the old checkout kept losing people, and I actually fixed it.",
-    "I keep saying yes because I don't want to seem like I can't handle it.",
+    { section: "achievements", text: "I finally understand why the old checkout kept losing people, and I actually fixed it." },
+    { section: "challenges", text: "I kept saying yes because I didn't want to seem like I couldn't handle it." },
+    { section: "goals", text: "I want feedback to feel like something I do early, not something I dread." },
   ],
   goals: [
-    { title: "Protect one deep-work day a week", detail: "Block it and defend it, even from your own manager." },
-    { title: "Give feedback in week one", detail: "Not month three." },
+    { title: "Protect one deep-work day a week", detail: "Block it and defend it, even from your own manager.", measure: "Four undisturbed deep-work days on the calendar by end of next quarter.", suggestion: "Book it before Monday planning so it isn't already spoken for.", quote: "The redesign only moved once I carved out real focus time." },
+    { title: "Give feedback in week one", detail: "Not month three.", measure: "No piece of feedback older than two weeks by the next check-in.", suggestion: "Draft the note the same day it surfaces, then schedule it while it's fresh." },
   ],
   goalsAnalysis: "Both goals directly target the two regrets above, which is a good sign - you're not setting aspirational goals, you're fixing the specific pattern that cost you this period.",
-  wellbeing: { score: 58, note: "Recovered late in the period, but spring was rough. Worth watching next cycle." },
-  sentiment: { label: "Cautiously positive", score: 42, note: "Pride in the shipped work is real, but it sits next to visible strain about boundaries and overload." },
+  wellbeing: { score: 58, note: "Recovered late in the period, but spring was rough. Worth watching next cycle.", suggestions: ["Protect one evening a week that stays screen-free", "Name your load in the weekly one-to-one before it spikes"] },
+  sentiment: {
+    label: "Cautiously positive",
+    score: 42,
+    note: "Pride in the shipped work is real, but it sits next to visible strain about boundaries and overload.",
+    positives: ["Real ownership and delivery on the checkout launch", "Mentoring that stuck without you running it"],
+    improvements: ["Boundaries around scope and hours", "Speaking up earlier instead of holding feedback"],
+  },
   conclusion: "This was a period where you proved you can lead something real, end to end, and people are already leaning on you for more. The work now is protecting your own time as fiercely as you protect the work.",
 };
 
@@ -145,10 +175,15 @@ document.querySelectorAll("[data-nav]").forEach((el) => {
 
 // ---------- DOM builder ----------
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+const SVG_TAGS = new Set(["svg", "g", "rect", "path", "text", "circle", "defs", "use", "clipPath", "linearGradient", "stop"]);
+
 function h(tag, attrs = {}, children = []) {
-  const el = document.createElement(tag);
+  const el = SVG_TAGS.has(tag)
+    ? document.createElementNS(SVG_NS, tag)
+    : document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
-    if (key === "class") el.className = value;
+    if (key === "class") el.setAttribute("class", value);
     else if (key === "html") el.innerHTML = value;
     else el.setAttribute(key, value);
   }
@@ -426,6 +461,7 @@ function validateReport(data) {
   }
 
   validateOptionalArray(data.achievements, "achievements", errors, titleDetailValidator);
+  validateOptionalArray(data.challenges, "challenges", errors, titleDetailValidator);
   validateOptionalArray(data.regrets, "regrets", errors, titleDetailValidator);
   validateOptionalArray(data.goals, "goals", errors, titleDetailValidator);
   validateOptionalArray(data.timeline, "timeline", errors, (item, path, errs) => {
@@ -480,24 +516,36 @@ function normalizeReport(obj) {
   const r = Object.assign({}, obj);
 
   r.achievements = Array.isArray(r.achievements) ? r.achievements : [];
+  r.challenges = Array.isArray(r.challenges) ? r.challenges : [];
   r.regrets = Array.isArray(r.regrets) ? r.regrets : [];
   r.skills = (Array.isArray(r.skills) ? r.skills : []).map((s) =>
     Object.assign({}, s, { levelPct: Math.max(0, Math.min(100, Number(s.level) || 0)) + "%" })
   );
   r.timeline = Array.isArray(r.timeline) ? r.timeline : [];
+  // Quotes may be legacy strings OR section-tagged objects ({ section, text }).
+  // Keep the objects (so quotes can be placed inside their topic - BLD-1005) and
+  // upgrade legacy strings to the object form so downstream code is uniform.
   r.quotes = (Array.isArray(r.quotes) ? r.quotes : [])
     .map((q) => {
-      if (typeof q === "string") return q;
-      if (q && typeof q === "object") return q.quote || q.text || q.detail || q.value || JSON.stringify(q);
-      return String(q);
+      if (typeof q === "string") return { section: "general", text: q };
+      if (q && typeof q === "object") {
+        const text = q.text || q.quote || q.detail || q.value || null;
+        return text ? { section: (q.section || "general").toLowerCase(), text } : null;
+      }
+      return null;
     })
     .filter(Boolean);
   r.goals = Array.isArray(r.goals) ? r.goals : [];
+  r.achievementSuggestions = Array.isArray(r.achievementSuggestions) ? r.achievementSuggestions : [];
+  r.regretSuggestions = Array.isArray(r.regretSuggestions) ? r.regretSuggestions : [];
+  r.skillDirections = Array.isArray(r.skillDirections) ? r.skillDirections : [];
+  r.summaryBullets = Array.isArray(r.summaryBullets) ? r.summaryBullets : [];
 
   r.jobTitle = r.jobTitle || "Untitled role";
   r.headline = r.headline || "";
   r.summary = r.summary || "";
   r.achievementsAnalysis = r.achievementsAnalysis || "";
+  r.challengesAnalysis = r.challengesAnalysis || "";
   r.regretsAnalysis = r.regretsAnalysis || "";
   r.skillsAnalysis = r.skillsAnalysis || "";
   r.goalsAnalysis = r.goalsAnalysis || "";
@@ -508,6 +556,8 @@ function normalizeReport(obj) {
     r.sentiment.pct = (r.sentiment.score + 100) / 2 + "%";
     r.sentiment.label = r.sentiment.label || "Mixed";
     r.sentiment.note = r.sentiment.note || "";
+    r.sentiment.positives = Array.isArray(r.sentiment.positives) ? r.sentiment.positives : [];
+    r.sentiment.improvements = Array.isArray(r.sentiment.improvements) ? r.sentiment.improvements : [];
   }
 
   r.wellbeing = isObj(r.wellbeing) && typeof r.wellbeing.score === "number" ? r.wellbeing : null;
@@ -515,6 +565,7 @@ function normalizeReport(obj) {
     r.wellbeing.score = Math.max(0, Math.min(100, Number(r.wellbeing.score) || 0));
     r.wellbeing.pct = r.wellbeing.score + "%";
     r.wellbeing.note = r.wellbeing.note || "";
+    r.wellbeing.suggestions = Array.isArray(r.wellbeing.suggestions) ? r.wellbeing.suggestions : [];
   }
 
   r.overallScore = Number(r.overallScore);
@@ -531,6 +582,10 @@ function normalizeReport(obj) {
 }
 
 // ---------- Report rendering ----------
+// Each topic is rendered as "your own words + the AI's read + what to do next"
+// (BLD-1006), with any verbatim quotes shown inside the section they came from
+// (BLD-1005). The report stays backward-compatible: every new field is optional
+// and legacy reports render fine when those fields are absent.
 
 function renderReport(report) {
   const root = document.getElementById("report-card") || document.getElementById("printable-report");
@@ -543,19 +598,259 @@ function renderReport(report) {
     day: "numeric",
   });
 
+  const topics = [
+    renderTopicAchievements(report),
+    renderTopicChallenges(report), // BLD-999: challenges were missing from the render
+    renderTopicRegrets(report),
+    renderTopicSkills(report), // BLD-1004: matched roles/actions from strengths
+    renderTopicGoals(report), // BLD-1002: suggestions + measurable parameters
+  ].filter(Boolean);
+
   [
     renderHeader(report, grade, periodLabel),
-    renderSentiment(report),
-    renderSummary(report),
-    renderAchievementsRegrets(report),
-    renderSkillsTimeline(report),
-    renderQuotes(report),
-    renderGoalsWellbeing(report),
+    renderSentiment(report), // BLD-1000: positives + improvements per section
+    renderOverview(report), // BLD-1001: scannable bullets beside the summary
+    renderTopicWellbeing(report), // BLD-1003: actionable suggestions
+    ...topics,
+    renderGeneralQuotes(report), // untagged legacy quotes (BLD-1005 fallback)
     renderConclusion(report),
     renderFooter(generatedDate),
   ]
     .filter(Boolean)
     .forEach((node) => root.appendChild(node));
+}
+
+// A topic = a full-width band with a heading, then a two-column split:
+// left  = the user's own reflection (items + their verbatim quotes)
+// right = the AI analysis + personalized recommendations
+function renderTopic(index, title, leftCol, rightCol, rightHeading = "Analysis & next steps") {
+  const children = [];
+
+  if (title) {
+    children.push(
+      h("div", { class: "report-card__topic-head" }, [
+        h("span", { class: "report-card__topic-index" }, String(index)),
+        h("h3", { class: "report-card__topic-title" }, title),
+      ])
+    );
+  }
+
+  children.push(
+    h("div", { class: "report-card__grid" }, [
+      h("div", { class: "report-card__col report-card__col--your" }, [
+        h("h6", { class: "report-card__label report-card__label--muted" }, "Your reflection"),
+        ...leftCol,
+      ]),
+      h("div", { class: "report-card__col report-card__col--insight" }, [
+        h("div", { class: "report-card__insight-card" }, [
+          h("h6", { class: "report-card__label report-card__insight-label" }, rightHeading),
+          ...rightCol,
+        ]),
+      ]),
+    ])
+  );
+
+  return h("section", { class: "report-card__topic" }, children);
+}
+
+function renderTopicSectionIntro(items) {
+  if (!items || !items.length) {
+    return [h("p", { class: "report-card__empty" }, "Nothing recorded here this period.")];
+  }
+  return items.map(renderReflectionItem);
+}
+
+// One reflection entry: title + detail + any verbatim quote attached to it.
+function renderReflectionItem(item) {
+  const nodes = [];
+  if (item && typeof item === "object") {
+    if (item.title) nodes.push(h("h5", { class: "report-card__item-title" }, item.title));
+    if (item.detail) nodes.push(h("p", { class: "report-card__item-detail" }, item.detail));
+    if (item.quote) nodes.push(h("p", { class: "report-card__inline-quote" }, `“${item.quote}”`));
+    // goals add measure + suggestion (BLD-1002)
+    if (item.measure) {
+      nodes.push(
+        h("p", { class: "report-card__measure" }, [
+          h("span", { class: "report-card__measure-tag" }, "How you'll know"),
+          item.measure,
+        ])
+      );
+    }
+    if (item.suggestion) {
+      nodes.push(
+        h("p", { class: "report-card__measure report-card__measure--suggestion" }, [
+          h("span", { class: "report-card__measure-tag" }, "Try"),
+          item.suggestion,
+        ])
+      );
+    }
+  } else {
+    nodes.push(h("p", { class: "report-card__item-detail" }, String(item)));
+  }
+  return h("div", { class: "report-card__item" }, nodes);
+}
+
+// Personalized recommendations as a compact checklist.
+function renderSuggestions(items, empty = null) {
+  if (!items || !items.length) return empty ? [empty] : [];
+  return [
+    h("ul", { class: "report-card__suggest" }, items.map((s) => h("li", {}, s))),
+  ];
+}
+
+function quoteNodes(report, section, items) {
+  if (!Array.isArray(report.quotes)) return [];
+  // Quotes already shown inline on an item (item.quote) should not repeat in the
+  // section band (BLD-1005). Fall back to BLD-999-era layout if none match.
+  const inlineTexts = new Set(
+    (items || []).map((i) => (i && typeof i === "object" ? i.quote || i.text : null)).filter(Boolean)
+  );
+  return report.quotes
+    .filter((q) => q && (q.section || "").toLowerCase() === section)
+    .map((q) => q.text || q.quote)
+    .filter(Boolean)
+    .filter((text) => !inlineTexts.has(text))
+    .map((text) => h("p", { class: "report-card__inline-quote" }, `“${text}”`));
+}
+
+// Untagged legacy quotes have no topic to live in; show them as one small band
+// so no words are lost (BLD-1005 keeps section-tagged quotes inline instead).
+function renderGeneralQuotes(report) {
+  if (!Array.isArray(report.quotes)) return null;
+  const texts = report.quotes
+    .filter((q) => q && (q.section === "general" || !q.section) && (q.text || q.quote))
+    .map((q) => q.text || q.quote);
+  if (!texts.length) return null;
+  return h("div", { class: "report-card__quotes" }, [
+    h("h6", { class: "report-card__quotes-label" }, "In your own words"),
+    ...texts.map((t) => h("p", { class: "report-card__quote" }, `“${t}”`)),
+  ]);
+}
+
+function renderTopicAchievements(report) {
+  const left = [
+    ...quoteNodes(report, "achievements", report.achievements),
+    ...renderTopicSectionIntro(report.achievements),
+  ];
+  if (!left.length && !report.achievementsAnalysis) return null;
+  return renderTopic(1, "Wins & achievements", left, [
+    report.achievementsAnalysis
+      ? h("p", { class: "report-card__note" }, report.achievementsAnalysis)
+      : null,
+    ...renderSuggestions(report.achievementSuggestions),
+  ], "What went well & how to build on it");
+}
+
+function renderTopicChallenges(report) {
+  const left = [
+    ...quoteNodes(report, "challenges", report.challenges),
+    ...renderTopicSectionIntro(report.challenges),
+  ];
+  if (!left.length && !report.challengesAnalysis) return null;
+  return renderTopic(2, "Challenges & how you handled them", left, [
+    report.challengesAnalysis
+      ? h("p", { class: "report-card__note" }, report.challengesAnalysis)
+      : null,
+  ], "What the hard parts revealed");
+}
+
+function renderTopicRegrets(report) {
+  const left = [
+    ...quoteNodes(report, "regrets", report.regrets),
+    ...renderTopicSectionIntro(report.regrets),
+  ];
+  if (!left.length && !report.regretsAnalysis) return null;
+  return renderTopic(3, "Regrets & lessons", left, [
+    report.regretsAnalysis
+      ? h("p", { class: "report-card__note" }, report.regretsAnalysis)
+      : null,
+    ...renderSuggestions(report.regretSuggestions),
+  ], "The pattern & how not to repeat it");
+}
+
+function renderTopicSkills(report) {
+  const left = [
+    ...quoteNodes(report, "skills", report.skills),
+    ...(report.skills && report.skills.length
+      ? report.skills.map((skill) =>
+          h("div", { class: "report-card__skill" }, [
+            h("div", { class: "report-card__skill-head" }, [
+              h("span", {}, skill.name),
+              h("span", {}, String(skill.level)),
+            ]),
+            h("div", { class: "report-card__bar" }, [
+              h("div", { class: "report-card__bar-fill", style: `width:${skill.levelPct}` }),
+            ]),
+          ])
+        )
+      : [h("p", { class: "report-card__empty" }, "No skills recorded this period.")]),
+  ];
+
+  const directions = (report.skillDirections || [])
+    .filter((d) => d && (d.role || d.reason))
+    .map((d) =>
+      h("div", { class: "report-card__direction" }, [
+        d.role ? h("h5", { class: "report-card__direction-role" }, d.role) : null,
+        d.reason ? h("p", { class: "report-card__item-detail" }, d.reason) : null,
+      ])
+    );
+
+  const right = [
+    report.skillsAnalysis ? h("p", { class: "report-card__note" }, report.skillsAnalysis) : null,
+    ...(directions.length
+      ? [
+          h("h6", { class: "report-card__label report-card__label--sub" }, "Roles worth leaning into"),
+          ...directions,
+        ]
+      : []),
+  ];
+  if (!report.skillsAnalysis && !directions.length) return null;
+  return renderTopic(4, "Skills & growth", left, right, "Analysis & where you could go next");
+}
+
+function renderTopicGoals(report) {
+  const left = [
+    ...quoteNodes(report, "goals", report.goals),
+    ...renderTopicSectionIntro(report.goals),
+  ];
+  const right = [
+    report.goalsAnalysis
+      ? h("p", { class: "report-card__note" }, report.goalsAnalysis)
+      : null,
+  ];
+  // Per-goal suggestion falls through below each goal on the user side; keep any
+  // explicit list-level advice here too if present.
+  if (!left.length && !right.some(Boolean)) return null;
+  return renderTopic(5, "Goals ahead", left, right, "Why these goals fit");
+}
+
+function renderTopicWellbeing(report) {
+  const wellbeingChildren = [
+    ...quoteNodes(report, "wellbeing", []),
+    h("div", { class: "report-card__skill-head" }, [
+      h("span", {}, "Energy across the period"),
+      h("span", {}, String(report.wellbeing ? report.wellbeing.score : "")),
+    ]),
+  ];
+  if (report.wellbeing) {
+    wellbeingChildren.push(
+      h("div", { class: "report-card__bar", style: "margin-bottom:var(--space-3)" }, [
+        h("div", { class: "report-card__bar-fill", style: `width:${report.wellbeing.pct}` }),
+      ]),
+      h("p", { class: "report-card__item-detail" }, report.wellbeing.note || "No note this period."),
+      ...renderSuggestions(report.wellbeing.suggestions)
+    );
+  } else {
+    wellbeingChildren.push(h("p", { class: "report-card__empty" }, "Not tracked this period."));
+  }
+
+  return h("div", { class: "report-card__topic" }, [
+    h("div", { class: "report-card__topic-head" }, [
+      h("span", { class: "report-card__topic-index" }, "◆"),
+      h("h3", { class: "report-card__topic-title" }, "Energy & wellbeing"),
+    ]),
+    h("div", { class: "report-card__wellbeing" }, wellbeingChildren),
+  ]);
 }
 
 function renderHeader(report, grade, periodLabel) {
@@ -588,104 +883,71 @@ function renderHeader(report, grade, periodLabel) {
 
 function renderSentiment(report) {
   if (!report.sentiment) return null;
-  return h("div", { class: "report-card__sentiment" }, [
-    h("div", { class: "report-card__sentiment-meta" }, [
-      h("h6", { class: "report-card__label" }, "Sentiment"),
-      h("div", { class: "report-card__sentiment-value" }, report.sentiment.label),
-    ]),
-    h("div", { class: "report-card__sentiment-body" }, [
-      h("div", { class: "report-card__bar" }, [
-        h("div", { class: "report-card__bar-fill", style: `width:${report.sentiment.pct}` }),
+  const s = report.sentiment;
+  const positives = Array.isArray(s.positives) ? s.positives : [];
+  const improvements = Array.isArray(s.improvements) ? s.improvements : [];
+  const children = [
+    h("div", { class: "report-card__sentiment-main" }, [
+      h("div", { class: "report-card__sentiment-meta" }, [
+        h("h6", { class: "report-card__label" }, "Sentiment"),
+        h("div", { class: "report-card__sentiment-value" }, s.label),
       ]),
-      h("p", { class: "report-card__sentiment-note" }, report.sentiment.note),
-    ]),
-  ]);
-}
-
-function renderSummary(report) {
-  if (!report.summary) return null;
-  return h("div", { class: "report-card__summary" }, [h("p", {}, report.summary)]);
-}
-
-function renderItemColumn(label, note, items, dividerRight) {
-  return h("div", { class: dividerRight ? "report-card__col report-card__col--divider" : "report-card__col" }, [
-    h("h6", { class: "report-card__label" }, label),
-    note ? h("p", { class: "report-card__note" }, note) : null,
-    ...items.map((item) =>
-      h("div", { class: "report-card__item" }, [
-        h("h5", { class: "report-card__item-title" }, item.title),
-        h("p", { class: "report-card__item-detail" }, item.detail),
-      ])
-    ),
-  ]);
-}
-
-function renderAchievementsRegrets(report) {
-  return h("div", { class: "report-card__grid" }, [
-    renderItemColumn("Achievements", report.achievementsAnalysis, report.achievements, true),
-    renderItemColumn("Regrets & lessons", report.regretsAnalysis, report.regrets, false),
-  ]);
-}
-
-function renderSkillsTimeline(report) {
-  const skillsCol = h("div", { class: "report-card__col report-card__col--divider" }, [
-    h("h6", { class: "report-card__label" }, "Skills grown"),
-    report.skillsAnalysis ? h("p", { class: "report-card__note" }, report.skillsAnalysis) : null,
-    ...report.skills.map((skill) =>
-      h("div", { class: "report-card__skill" }, [
-        h("div", { class: "report-card__skill-head" }, [h("span", {}, skill.name), h("span", {}, String(skill.level))]),
-        h("div", { class: "report-card__bar" }, [
-          h("div", { class: "report-card__bar-fill", style: `width:${skill.levelPct}` }),
+      h("div", { class: "report-card__sentiment-meter" }, [
+        h("div", { class: "report-card__bar report-card__bar--sentiment" }, [
+          h("div", { class: "report-card__bar-fill", style: `width:${s.pct}` }),
         ]),
-      ])
-    ),
-  ]);
-
-  const timelineCol = h("div", { class: "report-card__col" }, [
-    h("h6", { class: "report-card__label" }, "Timeline"),
-    ...report.timeline.map((tl) =>
-      h("div", { class: "report-card__timeline-item" }, [
-        h("div", { class: "report-card__timeline-dot" }),
-        h("div", {}, [
-          h("h5", { class: "report-card__item-title" }, tl.label),
-          h("p", { class: "report-card__item-detail" }, tl.detail),
-        ]),
-      ])
-    ),
-  ]);
-
-  return h("div", { class: "report-card__grid" }, [skillsCol, timelineCol]);
-}
-
-function renderQuotes(report) {
-  if (!report.quotes.length) return null;
-  return h("div", { class: "report-card__quotes" }, [
-    h("h6", { class: "report-card__quotes-label" }, "In your own words"),
-    ...report.quotes.map((q) => h("p", { class: "report-card__quote" }, `“${q}”`)),
-  ]);
-}
-
-function renderGoalsWellbeing(report) {
-  const goalsCol = renderItemColumn("Goals ahead", report.goalsAnalysis, report.goals, true);
-
-  const wellbeingChildren = [h("h6", { class: "report-card__label" }, "Energy & wellbeing")];
-  if (report.wellbeing) {
-    wellbeingChildren.push(
-      h("div", { class: "report-card__skill-head" }, [
-        h("span", {}, "Trend across the period"),
-        h("span", {}, String(report.wellbeing.score)),
+        h("span", { class: "report-card__sentiment-score" }, String(s.score)),
       ]),
-      h("div", { class: "report-card__bar", style: "margin-bottom:var(--space-3)" }, [
-        h("div", { class: "report-card__bar-fill", style: `width:${report.wellbeing.pct}` }),
-      ]),
-      h("p", { class: "report-card__item-detail" }, report.wellbeing.note)
+    ]),
+    s.note ? h("p", { class: "report-card__sentiment-note" }, s.note) : null,
+  ];
+
+  // Per-section sentiment signals (BLD-1000): positives to keep, improvements to watch.
+  if (positives.length || improvements.length) {
+    children.push(
+      h("div", { class: "report-card__sentiment-signals" }, [
+        positives.length
+          ? h("div", { class: "report-card__signal report-card__signal--pos" }, [
+              h("span", { class: "report-card__signal-tag" }, "Keep doing"),
+              h("ul", { class: "report-card__suggest" }, positives.map((p) => h("li", {}, p))),
+            ])
+          : null,
+        improvements.length
+          ? h("div", { class: "report-card__signal report-card__signal--neg" }, [
+              h("span", { class: "report-card__signal-tag" }, "Watch out for"),
+              h("ul", { class: "report-card__suggest" }, improvements.map((i) => h("li", {}, i))),
+            ])
+          : null,
+      ])
     );
-  } else {
-    wellbeingChildren.push(h("p", { class: "report-card__empty" }, "Not tracked this period."));
   }
-  const wellbeingCol = h("div", { class: "report-card__col" }, wellbeingChildren);
+  return h("div", { class: "report-card__sentiment" }, children);
+}
 
-  return h("div", { class: "report-card__grid report-card__grid--flush" }, [goalsCol, wellbeingCol]);
+// Overview = the descriptive summary alongside scannable bullet points (BLD-1001).
+function renderOverview(report) {
+  const bullets = Array.isArray(report.summaryBullets) ? report.summaryBullets : [];
+  const hasSummary = Boolean(report.summary || bullets.length);
+  if (!hasSummary) return null;
+
+  const groups = [];
+  if (report.summary) {
+    groups.push(
+      h("div", { class: "report-card__overview-col report-card__overview-col--desc" }, [
+        h("h6", { class: "report-card__label" }, "In a nutshell"),
+        h("p", { class: "report-card__summary-text" }, report.summary),
+      ])
+    );
+  }
+  if (bullets.length) {
+    groups.push(
+      h("div", { class: "report-card__overview-col" }, [
+        h("h6", { class: "report-card__label" }, "Key points"),
+        h("ul", { class: "report-card__suggest report-card__suggest--bullets" }, bullets.map((b) => h("li", {}, b))),
+      ])
+    );
+  }
+  return h("div", { class: "report-card__overview" }, groups);
 }
 
 function renderConclusion(report) {
