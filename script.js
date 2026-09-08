@@ -8,9 +8,9 @@ Then run a guided interview covering, roughly in this order:
 1. Achievements & wins - what am I proud of in this period?
 2. Regrets or missed opportunities - what would I do differently?
 3. Challenges I faced and how I handled them
-4. Skills I grew - ask me to name 4-6 skills and rate my growth in each from 0-100
+4. Skills I grew - ask me to name 4-6 skills and rate my growth in each from 0-10 (one decimal place allowed)
 5. Relationships & collaboration - who did I work well with, any friction worth noting?
-6. Energy & wellbeing - how has my energy/burnout trended? Ask for a 0-100 score and a short note
+6. Energy & wellbeing - how has my energy/burnout trended? Ask for a 0-10 score (one decimal place allowed) and a short note
 7. Goals for the next period
 
 Ask thoughtful follow-up questions where it helps, but keep the whole interview reasonably tight - no more than a few questions per topic.
@@ -20,7 +20,7 @@ When the interview is complete, respond with ONLY a single JSON code block (no o
 {
   "jobTitle": "string",
   "periodMonths": number,
-  "overallScore": number, // 0-100, your holistic assessment of how the period went
+  "overallScore": number, // 0-10, one decimal place allowed, your holistic assessment of how the period went
   "headline": "string", // one punchy sentence summing up the period
   "summary": "string", // 2-4 sentence summary
   "summaryBullets": ["string"], // 3-5 short scannable bullet points distilling the most important takeaways from the whole period
@@ -32,13 +32,13 @@ When the interview is complete, respond with ONLY a single JSON code block (no o
   "regrets": [{ "title": "string", "detail": "string", "quote": "string" }],
   "regretsAnalysis": "string", // 2-3 sentences analyzing the pattern across my regrets
   "regretSuggestions": ["string"], // 2-3 personalized actions to avoid repeating the same pattern
-  "skills": [{ "name": "string", "level": number }], // 0-100
+  "skills": [{ "name": "string", "level": number }], // 0-10, one decimal place allowed
   "skillsAnalysis": "string", // 2-3 sentences on what my skill growth (or stagnation) suggests
   "skillDirections": [{ "role": "string", "reason": "string" }], // 2-3 role directions that fit my strongest demonstrated skills (e.g. a visual-design strength -> UI/product roles), each with a one-line reason grounded in my answers
   "quotes": [{ "section": "string", "text": "string" }], // 3-6 short first-person quotes pulled verbatim from my answers, each tagged with the section it belongs to (one of: achievements, challenges, regrets, skills, goals, wellbeing). Use quotes[].section and quotes[].text
   "goals": [{ "title": "string", "detail": "string", "measure": "string", "suggestion": "string", "quote": "string" }], // measure = how I'll know the goal is met; suggestion = a personalized action to help reach it
   "goalsAnalysis": "string", // 2-3 sentences on whether these goals address what came up in the interview
-  "wellbeing": { "score": number, "note": "string", "suggestions": ["string"] }, // suggestions = 2-3 personalized actions to protect or raise my energy; optional
+  "wellbeing": { "score": number, "note": "string", "suggestions": ["string"] }, // score 0-10, one decimal place allowed; suggestions = 2-3 personalized actions to protect or raise my energy; optional
   "sentiment": {
     "label": "string", // one or two words, e.g. "Mostly positive", "Mixed", "Strained"
     "score": number, // -100 (very negative) to 100 (very positive), your read of my overall tone across all answers
@@ -135,7 +135,7 @@ const TOOLS = [
 const SAMPLE_REPORT = {
   jobTitle: "Senior Product Designer",
   periodMonths: 6,
-  overallScore: 78,
+  overallScore: 7.8,
   headline: "A period of real growth, with a launch you're proud of and a few boundaries you're still learning to hold.",
   summary: "You shipped the redesign you'd been pushing for a year, grew into a more senior voice in critiques, and started saying no to work that wasn't yours to own. The cost was a stretch in spring where the hours crept up.",
   summaryBullets: [
@@ -167,10 +167,10 @@ const SAMPLE_REPORT = {
     "Put a two-week cap on any difficult feedback you're holding.",
   ],
   skills: [
-    { name: "Systems thinking", level: 82 },
-    { name: "Stakeholder communication", level: 74 },
-    { name: "Delegation", level: 55 },
-    { name: "Motion design", level: 63 },
+    { name: "Systems thinking", level: 8.2 },
+    { name: "Stakeholder communication", level: 7.4 },
+    { name: "Delegation", level: 5.5 },
+    { name: "Motion design", level: 6.3 },
   ],
   skillsAnalysis: "Delegation is the clear outlier against otherwise strong growth - consistent with the regret about taking on too much. It's less a skill gap than a permission gap.",
   skillDirections: [
@@ -233,7 +233,7 @@ const PERSONAL_DEV_SAMPLE_REPORT = {
     suggestions: ["Name one thing a friend could genuinely carry this month", "Let someone finish their offer without a quick 'I'm fine'"],
   },
   wellbeing: {
-    score: 64,
+    score: 6.4,
     draining: "The low-grade guilt about not doing enough, and screens late into the night.",
     refilling: "Morning walks, cooking, and the hour of reading you now defend.",
     suggestions: ["Move the phone out of the bedroom", "Protect the walk even on 'too busy' days"],
@@ -261,14 +261,14 @@ const PERSONAL_DEV_SAMPLE_REPORT = {
 };
 
 function gradeFor(score) {
-  if (score >= 93) return "A+";
-  if (score >= 87) return "A";
-  if (score >= 80) return "A-";
-  if (score >= 73) return "B+";
-  if (score >= 65) return "B";
-  if (score >= 55) return "B-";
-  if (score >= 45) return "C+";
-  if (score >= 35) return "C";
+  if (score >= 9.3) return "A+";
+  if (score >= 8.7) return "A";
+  if (score >= 8.0) return "A-";
+  if (score >= 7.3) return "B+";
+  if (score >= 6.5) return "B";
+  if (score >= 5.5) return "B-";
+  if (score >= 4.5) return "C+";
+  if (score >= 3.5) return "C";
   return "C-";
 }
 
@@ -613,9 +613,9 @@ function validateJobReport(data) {
     typeof data.overallScore !== "number" ||
     Number.isNaN(data.overallScore) ||
     data.overallScore < 0 ||
-    data.overallScore > 100
+    data.overallScore > 10
   ) {
-    errors.push('"overallScore" must be a number between 0 and 100.');
+    errors.push('"overallScore" must be a number between 0 and 10.');
   }
 
   validateOptionalArray(data.achievements, "achievements", errors, titleDetailValidator);
@@ -628,8 +628,8 @@ function validateJobReport(data) {
   });
   validateOptionalArray(data.skills, "skills", errors, (item, path, errs) => {
     if (typeof item.name !== "string" || !item.name.trim()) errs.push(`"${path}.name" must be a non-empty string.`);
-    if (typeof item.level !== "number" || item.level < 0 || item.level > 100) {
-      errs.push(`"${path}.level" must be a number between 0 and 100.`);
+    if (typeof item.level !== "number" || item.level < 0 || item.level > 10) {
+      errs.push(`"${path}.level" must be a number between 0 and 10.`);
     }
   });
 
@@ -736,7 +736,7 @@ function normalizeJobReport(obj) {
   r.challenges = Array.isArray(r.challenges) ? r.challenges : [];
   r.regrets = Array.isArray(r.regrets) ? r.regrets : [];
   r.skills = (Array.isArray(r.skills) ? r.skills : []).map((s) =>
-    Object.assign({}, s, { levelPct: Math.max(0, Math.min(100, Number(s.level) || 0)) + "%" })
+    Object.assign({}, s, { levelPct: Math.max(0, Math.min(100, (Number(s.level) || 0) * 10)) + "%" })
   );
   r.timeline = Array.isArray(r.timeline) ? r.timeline : [];
   // Quotes may be legacy strings OR section-tagged objects ({ section, text }).
@@ -779,8 +779,8 @@ function normalizeJobReport(obj) {
 
   r.wellbeing = isObj(r.wellbeing) && typeof r.wellbeing.score === "number" ? r.wellbeing : null;
   if (r.wellbeing) {
-    r.wellbeing.score = Math.max(0, Math.min(100, Number(r.wellbeing.score) || 0));
-    r.wellbeing.pct = r.wellbeing.score + "%";
+    r.wellbeing.score = Math.max(0, Math.min(10, Number(r.wellbeing.score) || 0));
+    r.wellbeing.pct = Math.round(r.wellbeing.score * 10) + "%";
     r.wellbeing.note = r.wellbeing.note || "";
     r.wellbeing.suggestions = Array.isArray(r.wellbeing.suggestions) ? r.wellbeing.suggestions : [];
   }
