@@ -187,7 +187,7 @@ const SAMPLE_REPORT = {
     { title: "Give feedback in week one", detail: "Not month three.", measure: "No piece of feedback older than two weeks by the next check-in.", suggestion: "Draft the note the same day it surfaces, then schedule it while it's fresh." },
   ],
   goalsAnalysis: "Both goals directly target the two regrets above, which is a good sign - you're not setting aspirational goals, you're fixing the specific pattern that cost you this period.",
-  wellbeing: { score: 58, note: "Recovered late in the period, but spring was rough. Worth watching next cycle.", suggestions: ["Protect one evening a week that stays screen-free", "Name your load in the weekly one-to-one before it spikes"] },
+  wellbeing: { score: 5.8, note: "Recovered late in the period, but spring was rough. Worth watching next cycle.", suggestions: ["Protect one evening a week that stays screen-free", "Name your load in the weekly one-to-one before it spikes"] },
   sentiment: {
     label: "Cautiously positive",
     score: 42,
@@ -233,7 +233,7 @@ const PERSONAL_DEV_SAMPLE_REPORT = {
     suggestions: ["Name one thing a friend could genuinely carry this month", "Let someone finish their offer without a quick 'I'm fine'"],
   },
   wellbeing: {
-    score: 6.4,
+    score: 64,
     draining: "The low-grade guilt about not doing enough, and screens late into the night.",
     refilling: "Morning walks, cooking, and the hour of reading you now defend.",
     suggestions: ["Move the phone out of the bedroom", "Protect the walk even on 'too busy' days"],
