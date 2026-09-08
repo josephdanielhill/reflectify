@@ -183,6 +183,8 @@ main {
   border-radius: 9999px;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .btn:disabled {
   opacity: 0.45;
@@ -192,14 +194,16 @@ main {
   background: var(--color-accent);
   color: #ffffff;
 }
-.btn-primary:hover:not(:disabled) {
-  background: #1f332c;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
 .btn-primary:active:not(:disabled) {
   background: #16241e;
   transform: translateY(0);
+}
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    background: #1f332c;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
 }
 .btn-secondary {
   background: #ffffff;
@@ -594,11 +598,13 @@ textarea.input {
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.tool-card:hover {
-  background: #ffffff;
-  border-color: var(--color-accent);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .tool-card:hover {
+    background: #ffffff;
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
 }
 .tool-card:active {
   transform: translateY(0);
@@ -638,6 +644,8 @@ textarea.input {
   background: transparent;
   border: none;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .tool-card__main > :not(.tool-card__media) {
   padding-left: var(--space-4);
@@ -684,14 +692,20 @@ textarea.input {
 .tool-card__btn {
   width: auto;
   min-width: 200px;
+  min-height: 44px;
   padding: 10px 20px;
   font-size: 14px;
 }
 .tool-card__upload-link {
-  display: block;
   font-size: 12px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0 var(--space-4) var(--space-4);
   text-align: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .tool-card--placeholder {
   padding: 0 0 var(--space-4);
