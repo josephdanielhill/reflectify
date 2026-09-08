@@ -1408,6 +1408,57 @@ textarea.input {
   color: var(--color-neutral-600);
 }
 
+/* Personal Development Reflection framework (BLD-1012) */
+.report-card__season {
+  display: inline-block;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent-800);
+  background: var(--color-mint-light);
+  border-radius: 4px;
+  padding: 3px 8px;
+  margin-bottom: 10px;
+}
+.report-card__values-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .report-card__values-pair {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+.report-card__values-col {
+  background: var(--color-neutral-100);
+  border-radius: 8px;
+  padding: 12px;
+}
+.report-card__bar--growth .report-card__bar-fill {
+  background: var(--color-accent-500);
+}
+.report-card__shed-item {
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--color-neutral-100);
+  border-radius: 8px;
+  border-left: 3px solid var(--color-accent-400);
+}
+.report-card__shed-item .report-card__item-title {
+  margin-bottom: 4px;
+}
+.report-card__shed-item .report-card__item-detail {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-neutral-600);
+}
+
+
 /* ---------- Print ---------- */
 
 @media print {
