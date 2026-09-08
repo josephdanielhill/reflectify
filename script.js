@@ -125,6 +125,7 @@ const TOOLS = [
     icon: "🌱",
     name: "Personal Development Reflection",
     image: "illustration-personal-development-reflection.jpg",
+    alpha: true,
     description:
       "Guides a forward-looking reflection on who you're becoming - values, growth, what you've shed, patterns, and your north star - then hands back a JSON file for a reflection summary.",
     promptTemplate: PERSONAL_DEV_PROMPT_TEMPLATE,
@@ -339,6 +340,7 @@ function initToolGrid() {
       h("div", { class: "tool-card__header-line" }, [
         h("span", { class: "tool-card__icon" }, tool.icon),
         h("h3", { class: "tool-card__title" }, tool.name),
+        tool.alpha ? h("span", { class: "tool-card__alpha" }, "alpha") : null,
       ]),
       h("p", { class: "tool-card__desc" }, tool.description),
       h("div", { class: "tool-card__cta-wrap" }, [
