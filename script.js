@@ -974,12 +974,12 @@ function renderJobReport(report) {
     ];
     const right = [
       v.congruence ? h("p", { class: "report-card__note" }, v.congruence) : null,
-      v.realignment && v.realignment.length
+      ...(v.realignment && v.realignment.length
         ? [
             h("h6", { class: "report-card__label report-card__label--sub" }, "How to close the gap"),
             h("ul", { class: "report-card__suggest" }, v.realignment.map((r) => h("li", {}, r))),
           ]
-        : null,
+        : []),
     ];
     return renderTopic(1, "What you've valued", left, right, "Living by your values");
     }
@@ -1046,12 +1046,12 @@ function renderJobReport(report) {
     ];
     const right = [
       report.patternsAnalysis ? h("p", { class: "report-card__note" }, report.patternsAnalysis) : null,
-      report.patternDirections && report.patternDirections.length
+      ...(report.patternDirections && report.patternDirections.length
         ? [
             h("h6", { class: "report-card__label report-card__label--sub" }, "Directions to practise"),
             h("ul", { class: "report-card__suggest" }, report.patternDirections.map((d) => h("li", {}, d))),
           ]
-        : null,
+        : []),
     ];
     if (!patterns.length && !report.patternsAnalysis) return null;
     return renderTopic(4, "Patterns that hold you back", left, right, "Analysis & what to practise");
@@ -1066,12 +1066,12 @@ function renderJobReport(report) {
     ];
     const right = [
       rel.balance ? h("p", { class: "report-card__note" }, rel.balance) : null,
-      rel.suggestions && rel.suggestions.length
+      ...(rel.suggestions && rel.suggestions.length
         ? [
             h("h6", { class: "report-card__label report-card__label--sub" }, "Ways to rebalance"),
             h("ul", { class: "report-card__suggest" }, rel.suggestions.map((s) => h("li", {}, s))),
           ]
-        : null,
+        : []),
     ];
     return renderTopic(5, "How you show up with others", left, right, "Analysis & how to rebalance");
     }
