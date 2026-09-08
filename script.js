@@ -8,9 +8,9 @@ Then run a guided interview covering, roughly in this order:
 1. Achievements & wins - what am I proud of in this period?
 2. Regrets or missed opportunities - what would I do differently?
 3. Challenges I faced and how I handled them
-4. Skills I grew - ask me to name 4-6 skills and rate my growth in each from 0-100
+4. Skills I grew - ask me to name 4-6 skills and rate my growth in each from 0-10 (one decimal place allowed)
 5. Relationships & collaboration - who did I work well with, any friction worth noting?
-6. Energy & wellbeing - how has my energy/burnout trended? Ask for a 0-100 score and a short note
+6. Energy & wellbeing - how has my energy/burnout trended? Ask for a 0-10 score (one decimal place allowed) and a short note
 7. Goals for the next period
 
 Ask thoughtful follow-up questions where it helps, but keep the whole interview reasonably tight - no more than a few questions per topic.
@@ -20,7 +20,7 @@ When the interview is complete, respond with ONLY a single JSON code block (no o
 {
   "jobTitle": "string",
   "periodMonths": number,
-  "overallScore": number, // 0-100, your holistic assessment of how the period went
+  "overallScore": number, // 0-10, one decimal place allowed, your holistic assessment of how the period went
   "headline": "string", // one punchy sentence summing up the period
   "summary": "string", // 2-4 sentence summary
   "summaryBullets": ["string"], // 3-5 short scannable bullet points distilling the most important takeaways from the whole period
@@ -32,13 +32,13 @@ When the interview is complete, respond with ONLY a single JSON code block (no o
   "regrets": [{ "title": "string", "detail": "string", "quote": "string" }],
   "regretsAnalysis": "string", // 2-3 sentences analyzing the pattern across my regrets
   "regretSuggestions": ["string"], // 2-3 personalized actions to avoid repeating the same pattern
-  "skills": [{ "name": "string", "level": number }], // 0-100
+  "skills": [{ "name": "string", "level": number }], // 0-10, one decimal place allowed
   "skillsAnalysis": "string", // 2-3 sentences on what my skill growth (or stagnation) suggests
   "skillDirections": [{ "role": "string", "reason": "string" }], // 2-3 role directions that fit my strongest demonstrated skills (e.g. a visual-design strength -> UI/product roles), each with a one-line reason grounded in my answers
   "quotes": [{ "section": "string", "text": "string" }], // 3-6 short first-person quotes pulled verbatim from my answers, each tagged with the section it belongs to (one of: achievements, challenges, regrets, skills, goals, wellbeing). Use quotes[].section and quotes[].text
   "goals": [{ "title": "string", "detail": "string", "measure": "string", "suggestion": "string", "quote": "string" }], // measure = how I'll know the goal is met; suggestion = a personalized action to help reach it
   "goalsAnalysis": "string", // 2-3 sentences on whether these goals address what came up in the interview
-  "wellbeing": { "score": number, "note": "string", "suggestions": ["string"] }, // suggestions = 2-3 personalized actions to protect or raise my energy; optional
+  "wellbeing": { "score": number, "note": "string", "suggestions": ["string"] }, // score 0-10, one decimal place allowed; suggestions = 2-3 personalized actions to protect or raise my energy; optional
   "sentiment": {
     "label": "string", // one or two words, e.g. "Mostly positive", "Mixed", "Strained"
     "score": number, // -100 (very negative) to 100 (very positive), your read of my overall tone across all answers
@@ -53,6 +53,63 @@ Base every analysis field on genuine patterns in my actual answers, not generic 
 
 Save that JSON as a .json file (for example reflection.json) so I can upload it to my reflection report tool.`;
 
+const PERSONAL_DEV_PROMPT_TEMPLATE = `You are guiding me through a structured reflection on my personal development and growth. Interview me one question at a time and wait for my answer before moving to the next question. Keep your tone warm, encouraging, and free of judgment, and keep questions concise.
+
+Step 1: Ask what language I'd like to use for this reflection (e.g. English, German, Spanish, French). From that point on, ask every question in that language, and write every piece of prose in your final JSON output in that language too. Keep the JSON keys themselves in English exactly as specified below, regardless of the chosen language.
+Step 2: Ask how many months this reflection covers (e.g. 3, 6, 12).
+Step 3: Ask me to name, in one or two words, the season of life I'm currently in (a label I choose myself, e.g. "building," "restoring," "transition," "settling").
+
+Then run a guided interview covering, roughly in this order:
+1. Where I've been - what period of my life did these months belong to, and what was the underlying story of it?
+2. What I've valued - what did I actually prioritize with my time and attention? What does that say about what matters to me right now? (Ask whether that matches the values I'd claim to hold, and where it doesn't.)
+3. Growth & change - in what concrete ways have I grown as a person this period? Ask me to name 3-5 qualities I developed and rate my change in each from -100 to +100 (negative = moved away from it).
+4. What I've shed or outgrown - what beliefs, habits, roles, or people-am-I-becoming no longer fit? What did letting go cost me, and what did it free up?
+5. Limiting patterns - ask me to name 2-3 recurring patterns that hold me back (self-criticism, avoidance, people-pleasing, overcommitting, etc.). For each, ask for a specific moment this period where it showed up.
+6. How I show up with others - my relationships and how I give and receive support. Anywhere I've been giving too much, or not letting myself be helped?
+7. Energy & whole-life wellbeing - not just work: how are my body, mind, and spirit doing? Ask for a 0-100 score and a short note on what's draining and what's refilling me.
+8. Who I'm becoming - if I look ahead one year, what kind of person do I want to be that I'm not yet? What's the single most important change that would move me toward that?
+9. North star commitment - one concrete personal commitment for the next period that moves me toward who I'm becoming.
+
+Ask thoughtful follow-up questions where it helps, but keep the whole interview reasonably tight.
+
+When the interview is complete, respond with ONLY a single JSON code block (no other text before or after) that exactly matches this schema:
+
+{
+  "season": "string",
+  "periodMonths": number,
+  "lifeStory": "string",
+  "values": {
+    "claimed": ["string"],
+    "actual": ["string"],
+    "congruence": "string",
+    "realignment": ["string"]
+  },
+  "growth": [{ "quality": "string", "change": number }],
+  "growthAnalysis": "string",
+  "shed": [{ "item": "string", "cost": "string", "freed": "string" }],
+  "shedAnalysis": "string",
+  "patterns": [{ "name": "string", "moment": "string", "quote": "string" }],
+  "patternsAnalysis": "string",
+  "patternDirections": ["string"],
+  "relationships": { "note": "string", "balance": "string", "suggestions": ["string"] },
+  "wellbeing": { "score": number, "draining": "string", "refilling": "string", "suggestions": ["string"] },
+  "quotes": [{ "section": "string", "text": "string" }],
+  "becoming": "string",
+  "northStar": { "commitment": "string", "why": "string", "measure": "string", "suggestions": ["string"] },
+  "sentiment": {
+    "label": "string",
+    "score": number,
+    "note": "string",
+    "positives": ["string"],
+    "tensions": ["string"]
+  },
+  "conclusion": "string"
+}
+
+Base every analysis field on genuine patterns in my actual answers, not generic advice. Before writing the final JSON, review each analysis field (lifeStory, values.congruence, growthAnalysis, shedAnalysis, patternsAnalysis, relationships.balance, wellbeing, becoming, northStar.why, sentiment.note, conclusion) and confirm it references a specific detail from my answers rather than a generic observation that could apply to anyone; rewrite any field that fails this check.
+
+Save that JSON as a .json file so I can upload it to my reflection report tool.`;
+
 const TOOLS = [
   {
     id: "job-reflection",
@@ -63,12 +120,22 @@ const TOOLS = [
       "Interviews you about achievements, regrets, growth and goals from your current job, then hands back a JSON file for a reflection summary.",
     promptTemplate: PROMPT_TEMPLATE,
   },
+  {
+    id: "personal-development",
+    icon: "🌱",
+    name: "Personal Reflection",
+    image: "illustration-personal-development-reflection.jpg",
+    alpha: true,
+    description:
+      "Guides a forward-looking reflection on who you're becoming - values, growth, what you've shed, patterns, and your north star - then hands back a JSON file for a reflection summary.",
+    promptTemplate: PERSONAL_DEV_PROMPT_TEMPLATE,
+  },
 ];
 
 const SAMPLE_REPORT = {
   jobTitle: "Senior Product Designer",
   periodMonths: 6,
-  overallScore: 78,
+  overallScore: 7.8,
   headline: "A period of real growth, with a launch you're proud of and a few boundaries you're still learning to hold.",
   summary: "You shipped the redesign you'd been pushing for a year, grew into a more senior voice in critiques, and started saying no to work that wasn't yours to own. The cost was a stretch in spring where the hours crept up.",
   summaryBullets: [
@@ -100,10 +167,10 @@ const SAMPLE_REPORT = {
     "Put a two-week cap on any difficult feedback you're holding.",
   ],
   skills: [
-    { name: "Systems thinking", level: 82 },
-    { name: "Stakeholder communication", level: 74 },
-    { name: "Delegation", level: 55 },
-    { name: "Motion design", level: 63 },
+    { name: "Systems thinking", level: 8.2 },
+    { name: "Stakeholder communication", level: 7.4 },
+    { name: "Delegation", level: 5.5 },
+    { name: "Motion design", level: 6.3 },
   ],
   skillsAnalysis: "Delegation is the clear outlier against otherwise strong growth - consistent with the regret about taking on too much. It's less a skill gap than a permission gap.",
   skillDirections: [
@@ -120,7 +187,7 @@ const SAMPLE_REPORT = {
     { title: "Give feedback in week one", detail: "Not month three.", measure: "No piece of feedback older than two weeks by the next check-in.", suggestion: "Draft the note the same day it surfaces, then schedule it while it's fresh." },
   ],
   goalsAnalysis: "Both goals directly target the two regrets above, which is a good sign - you're not setting aspirational goals, you're fixing the specific pattern that cost you this period.",
-  wellbeing: { score: 58, note: "Recovered late in the period, but spring was rough. Worth watching next cycle.", suggestions: ["Protect one evening a week that stays screen-free", "Name your load in the weekly one-to-one before it spikes"] },
+  wellbeing: { score: 5.8, note: "Recovered late in the period, but spring was rough. Worth watching next cycle.", suggestions: ["Protect one evening a week that stays screen-free", "Name your load in the weekly one-to-one before it spikes"] },
   sentiment: {
     label: "Cautiously positive",
     score: 42,
@@ -131,15 +198,77 @@ const SAMPLE_REPORT = {
   conclusion: "This was a period where you proved you can lead something real, end to end, and people are already leaning on you for more. The work now is protecting your own time as fiercely as you protect the work.",
 };
 
+const PERSONAL_DEV_SAMPLE_REPORT = {
+  season: "rebuilding",
+  periodMonths: 6,
+  lifeStory: "Six months of quiet reconstruction - you slowed down, named what wasn't working, and began choosing your energy instead of spending it.",
+  values: {
+    claimed: ["Honesty", "Rest", "Presence"],
+    actual: ["Performing availability", "Overcommitting", "Busyness as worth"],
+    congruence:
+      "There's a real gap: you claim rest and presence but your behaviour kept serving availability and output. The honesty is that you could see it most months but only recently started acting on it.",
+    realignment: ["Say no to two commitments a month before they land", "Schedule rest like a meeting, not as a leftover"],
+  },
+  growth: [
+    { quality: "Self-compassion", change: 62 },
+    { quality: "Setting boundaries", change: 48 },
+    { quality: "Being still", change: 35 },
+    { quality: "People-pleasing", change: -27 },
+  ],
+  growthAnalysis: "Growth clustered exactly where the work was - you got kinder to yourself and more willing to say no, while the old people-pleasing reflex loosened rather than vanished.",
+  shed: [
+    { item: "The belief that rest must be earned", cost: "Grief over years of running on empty", freed: "Permission to stop without guilt" },
+    { item: "The role of 'always reliable one'", cost: "Some friends leaned harder at first", freed: "Space to ask for help yourself" },
+  ],
+  shedAnalysis: "You let go of stories you'd been carrying for years. What they cost you is real, but what they freed is the thing the growth scores keep pointing to.",
+  patterns: [
+    { name: "Overcommitting before checking capacity", moment: "Said yes to a weekend trip while already exhausted, then resented it all weekend.", quote: "I say yes first and do the maths after." },
+    { name: "Waiting to be asked before asking for help", moment: "Sat with a heavy project for two weeks instead of asking a friend to split it.", quote: "Asking feels like admitting I can't cope." },
+  ],
+  patternsAnalysis: "Both patterns share one root: you treat your own capacity as negotiable and your needs as last. The moment you gave yourself permission to check first, both softened.",
+  patternDirections: ["Build a 'check capacity before yes' rule and make it visible", "Practise one direct ask for help a week until it stops feeling like failure"],
+  relationships: {
+    note: "You gave a lot and let little back in. The people closest to you noticed the shift when you finally let them help.",
+    balance: "Still tilted toward giving - the balance only starts to level when you actively invite support rather than waiting for it.",
+    suggestions: ["Name one thing a friend could genuinely carry this month", "Let someone finish their offer without a quick 'I'm fine'"],
+  },
+  wellbeing: {
+    score: 64,
+    draining: "The low-grade guilt about not doing enough, and screens late into the night.",
+    refilling: "Morning walks, cooking, and the hour of reading you now defend.",
+    suggestions: ["Move the phone out of the bedroom", "Protect the walk even on 'too busy' days"],
+  },
+  quotes: [
+    { section: "values", text: "I say yes first and do the maths after." },
+    { section: "patterns", text: "Asking feels like admitting I can't cope." },
+    { section: "becoming", text: "I want to be someone whose yes means something because my no does too." },
+  ],
+  becoming: "A year from now you want to be someone who chooses deliberately - whose rest is protected, whose yes means something, and who lets people in rather than managing everything alone.",
+  northStar: {
+    commitment: "Protect one full day of rest a week, no exceptions.",
+    why: "Every growth score and shed item traces back to learning that rest is a right, not a reward.",
+    measure: "Seven rest days kept across the next quarter, logged honestly.",
+    suggestions: ["Block it on Sunday for the week ahead", "Tell one person your plan so it's not silent"],
+  },
+  sentiment: {
+    label: "Emerging hope",
+    score: 38,
+    note: "The tone is weary but turning - real grief sits beside a genuine sense that the rebuild is working.",
+    positives: ["Clearer boundaries and kinder self-talk", "Consistent morning walks", "The first real asks for help"],
+    tensions: ["Old overcommitting reflex still fires", "Guilt about slowing down", "Nights are still screen-heavy"],
+  },
+  conclusion: "You spent this period learning, often painfully, that you are allowed to be less. The growth scores confirm what the shed list already knew: the rebuild is working, and the next chapter is about protecting it on purpose.",
+};
+
 function gradeFor(score) {
-  if (score >= 93) return "A+";
-  if (score >= 87) return "A";
-  if (score >= 80) return "A-";
-  if (score >= 73) return "B+";
-  if (score >= 65) return "B";
-  if (score >= 55) return "B-";
-  if (score >= 45) return "C+";
-  if (score >= 35) return "C";
+  if (score >= 9.3) return "A+";
+  if (score >= 8.7) return "A";
+  if (score >= 8.0) return "A-";
+  if (score >= 7.3) return "B+";
+  if (score >= 6.5) return "B";
+  if (score >= 5.5) return "B-";
+  if (score >= 4.5) return "C+";
+  if (score >= 3.5) return "C";
   return "C-";
 }
 
@@ -211,6 +340,7 @@ function initToolGrid() {
       h("div", { class: "tool-card__header-line" }, [
         h("span", { class: "tool-card__icon" }, tool.icon),
         h("h3", { class: "tool-card__title" }, tool.name),
+        tool.alpha ? h("span", { class: "tool-card__alpha" }, "alpha") : null,
       ]),
       h("p", { class: "tool-card__desc" }, tool.description),
       h("div", { class: "tool-card__cta-wrap" }, [
@@ -340,7 +470,8 @@ function initUploadView() {
 
   sampleBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    currentReport = normalizeReport(SAMPLE_REPORT);
+    const isDev = selectedTool && selectedTool.id === "personal-development";
+    currentReport = normalizeReport(isDev ? PERSONAL_DEV_SAMPLE_REPORT : SAMPLE_REPORT);
     renderReport(currentReport);
     showView("report");
   });
@@ -437,7 +568,34 @@ function extractFirstJsonObject(text) {
 
 // ---------- Validation (hybrid: strict for load-bearing fields, lenient for optional) ----------
 
+// Detect which framework a report belongs to from its schema. Personal
+// Development reports carry development-specific keys that Job reports never do.
+function reportFramework(data) {
+  if (
+    data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    (typeof data.season === "string" ||
+      typeof data.lifeStory === "string" ||
+      Array.isArray(data.values) ||
+      Array.isArray(data.growth) ||
+      Array.isArray(data.shed) ||
+      Array.isArray(data.patterns) ||
+      typeof data.becoming === "string" ||
+      (data.northStar && typeof data.northStar === "object"))
+  ) {
+    return "personal-development";
+  }
+  return "job-reflection";
+}
+
 function validateReport(data) {
+  return reportFramework(data) === "personal-development"
+    ? validatePersonalDevReport(data)
+    : validateJobReport(data);
+}
+
+function validateJobReport(data) {
   const errors = [];
   const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 
@@ -455,9 +613,9 @@ function validateReport(data) {
     typeof data.overallScore !== "number" ||
     Number.isNaN(data.overallScore) ||
     data.overallScore < 0 ||
-    data.overallScore > 100
+    data.overallScore > 10
   ) {
-    errors.push('"overallScore" must be a number between 0 and 100.');
+    errors.push('"overallScore" must be a number between 0 and 10.');
   }
 
   validateOptionalArray(data.achievements, "achievements", errors, titleDetailValidator);
@@ -470,8 +628,8 @@ function validateReport(data) {
   });
   validateOptionalArray(data.skills, "skills", errors, (item, path, errs) => {
     if (typeof item.name !== "string" || !item.name.trim()) errs.push(`"${path}.name" must be a non-empty string.`);
-    if (typeof item.level !== "number" || item.level < 0 || item.level > 100) {
-      errs.push(`"${path}.level" must be a number between 0 and 100.`);
+    if (typeof item.level !== "number" || item.level < 0 || item.level > 10) {
+      errs.push(`"${path}.level" must be a number between 0 and 10.`);
     }
   });
 
@@ -483,6 +641,59 @@ function validateReport(data) {
   }
   if (data.wellbeing !== undefined && data.wellbeing !== null && !isObj(data.wellbeing)) {
     errors.push('"wellbeing" must be an object if present.');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+// Personal Development framework validation. Load-bearing: season, periodMonths,
+// and (optionally) the structured sub-objects. Everything else is lenient.
+function validatePersonalDevReport(data) {
+  const errors = [];
+  const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+
+  if (!isObj(data)) {
+    return { valid: false, errors: ["The uploaded JSON must be a single object."] };
+  }
+
+  if (typeof data.season !== "string" || !data.season.trim()) {
+    errors.push('"season" must be a non-empty string (your own label for this period of life).');
+  }
+  if (!Number.isInteger(data.periodMonths) || data.periodMonths < 1 || data.periodMonths > 120) {
+    errors.push('"periodMonths" must be a whole number between 1 and 120.');
+  }
+
+  if (data.values !== undefined && data.values !== null && !isObj(data.values)) {
+    errors.push('"values" must be an object if present.');
+  }
+  if (data.northStar !== undefined && data.northStar !== null && !isObj(data.northStar)) {
+    errors.push('"northStar" must be an object if present.');
+  }
+
+  validateOptionalArray(data.growth, "growth", errors, (item, path, errs) => {
+    if (typeof item.quality !== "string" || !item.quality.trim()) errs.push(`"${path}.quality" must be a non-empty string.`);
+    if (typeof item.change !== "number" || item.change < -100 || item.change > 100) {
+      errs.push(`"${path}.change" must be a number between -100 and +100 (negative = moved away from the quality).`);
+    }
+  });
+  validateOptionalArray(data.shed, "shed", errors, (item, path, errs) => {
+    if (typeof item.item !== "string" || !item.item.trim()) errs.push(`"${path}.item" must be a non-empty string.`);
+  });
+  validateOptionalArray(data.patterns, "patterns", errors, (item, path, errs) => {
+    if (typeof item.name !== "string" || !item.name.trim()) errs.push(`"${path}.name" must be a non-empty string.`);
+    if (typeof item.moment !== "string" || !item.moment.trim()) errs.push(`"${path}.moment" must be a non-empty string (a concrete instance).`);
+  });
+  if (data.relationships !== undefined && data.relationships !== null && !isObj(data.relationships)) {
+    errors.push('"relationships" must be an object if present.');
+  }
+  if (data.wellbeing !== undefined && data.wellbeing !== null && !isObj(data.wellbeing)) {
+    errors.push('"wellbeing" must be an object if present.');
+  }
+  if (data.quotes !== undefined && !Array.isArray(data.quotes)) {
+    errors.push('"quotes" must be an array if present.');
+  }
+  if (data.sentiment !== undefined && data.sentiment !== null && !isObj(data.sentiment)) {
+    errors.push('"sentiment" must be an object if present.');
   }
 
   return { valid: errors.length === 0, errors };
@@ -512,6 +723,12 @@ function validateOptionalArray(arr, name, errors, itemValidator) {
 // ---------- Normalize (lenient defaulting for optional/prose fields) ----------
 
 function normalizeReport(obj) {
+  return reportFramework(obj) === "personal-development"
+    ? normalizePersonalDevReport(obj)
+    : normalizeJobReport(obj);
+}
+
+function normalizeJobReport(obj) {
   const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
   const r = Object.assign({}, obj);
 
@@ -519,7 +736,7 @@ function normalizeReport(obj) {
   r.challenges = Array.isArray(r.challenges) ? r.challenges : [];
   r.regrets = Array.isArray(r.regrets) ? r.regrets : [];
   r.skills = (Array.isArray(r.skills) ? r.skills : []).map((s) =>
-    Object.assign({}, s, { levelPct: Math.max(0, Math.min(100, Number(s.level) || 0)) + "%" })
+    Object.assign({}, s, { levelPct: Math.max(0, Math.min(100, (Number(s.level) || 0) * 10)) + "%" })
   );
   r.timeline = Array.isArray(r.timeline) ? r.timeline : [];
   // Quotes may be legacy strings OR section-tagged objects ({ section, text }).
@@ -562,8 +779,8 @@ function normalizeReport(obj) {
 
   r.wellbeing = isObj(r.wellbeing) && typeof r.wellbeing.score === "number" ? r.wellbeing : null;
   if (r.wellbeing) {
-    r.wellbeing.score = Math.max(0, Math.min(100, Number(r.wellbeing.score) || 0));
-    r.wellbeing.pct = r.wellbeing.score + "%";
+    r.wellbeing.score = Math.max(0, Math.min(10, Number(r.wellbeing.score) || 0));
+    r.wellbeing.pct = Math.round(r.wellbeing.score * 10) + "%";
     r.wellbeing.note = r.wellbeing.note || "";
     r.wellbeing.suggestions = Array.isArray(r.wellbeing.suggestions) ? r.wellbeing.suggestions : [];
   }
@@ -581,13 +798,103 @@ function normalizeReport(obj) {
   return r;
 }
 
-// ---------- Report rendering ----------
+// Personal Development normalizer: lenient defaulting for the dev schema.
+function normalizePersonalDevReport(obj) {
+  const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+  const r = Object.assign({}, obj);
+
+  r.season = r.season || "this period";
+  r.periodMonths = Number(r.periodMonths) || 0;
+  r.lifeStory = r.lifeStory || "";
+
+  r.values = isObj(r.values) ? r.values : null;
+  if (r.values) {
+    r.values.claimed = Array.isArray(r.values.claimed) ? r.values.claimed : [];
+    r.values.actual = Array.isArray(r.values.actual) ? r.values.actual : [];
+    r.values.congruence = r.values.congruence || "";
+    r.values.realignment = Array.isArray(r.values.realignment) ? r.values.realignment : [];
+  }
+
+  r.growth = (Array.isArray(r.growth) ? r.growth : []).map((g) => {
+    const change = Math.max(-100, Math.min(100, Number(g.change) || 0));
+    return Object.assign({}, g, { change, pct: (change + 100) / 2 + "%" });
+  });
+  r.growthAnalysis = r.growthAnalysis || "";
+
+  r.shed = Array.isArray(r.shed) ? r.shed : [];
+  r.shedAnalysis = r.shedAnalysis || "";
+
+  r.patterns = Array.isArray(r.patterns) ? r.patterns : [];
+  r.patternsAnalysis = r.patternsAnalysis || "";
+  r.patternDirections = Array.isArray(r.patternDirections) ? r.patternDirections : [];
+
+  r.relationships = isObj(r.relationships) ? r.relationships : null;
+  if (r.relationships) {
+    r.relationships.note = r.relationships.note || "";
+    r.relationships.balance = r.relationships.balance || "";
+    r.relationships.suggestions = Array.isArray(r.relationships.suggestions) ? r.relationships.suggestions : [];
+  }
+
+  r.wellbeing = isObj(r.wellbeing) && typeof r.wellbeing.score === "number" ? r.wellbeing : null;
+  if (r.wellbeing) {
+    r.wellbeing.score = Math.max(0, Math.min(100, Number(r.wellbeing.score) || 0));
+    r.wellbeing.pct = r.wellbeing.score + "%";
+    r.wellbeing.draining = r.wellbeing.draining || "";
+    r.wellbeing.refilling = r.wellbeing.refilling || "";
+    r.wellbeing.suggestions = Array.isArray(r.wellbeing.suggestions) ? r.wellbeing.suggestions : [];
+  }
+
+  r.quotes = (Array.isArray(r.quotes) ? r.quotes : [])
+    .map((q) => {
+      if (typeof q === "string") return { section: "general", text: q };
+      if (q && typeof q === "object") {
+        const text = q.text || q.quote || null;
+        return text ? { section: (q.section || "general").toLowerCase(), text } : null;
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  r.becoming = r.becoming || "";
+
+  r.northStar = isObj(r.northStar) ? r.northStar : null;
+  if (r.northStar) {
+    r.northStar.commitment = r.northStar.commitment || "";
+    r.northStar.why = r.northStar.why || "";
+    r.northStar.measure = r.northStar.measure || "";
+    r.northStar.suggestions = Array.isArray(r.northStar.suggestions) ? r.northStar.suggestions : [];
+  }
+
+  r.sentiment = isObj(r.sentiment) ? r.sentiment : null;
+  if (r.sentiment) {
+    r.sentiment.score = Math.max(-100, Math.min(100, Number(r.sentiment.score) || 0));
+    r.sentiment.pct = (r.sentiment.score + 100) / 2 + "%";
+    r.sentiment.label = r.sentiment.label || "Mixed";
+    r.sentiment.note = r.sentiment.note || "";
+    r.sentiment.positives = Array.isArray(r.sentiment.positives) ? r.sentiment.positives : [];
+    r.sentiment.tensions = Array.isArray(r.sentiment.tensions) ? r.sentiment.tensions : [];
+  }
+
+  if (!r.conclusion || typeof r.conclusion !== "string") {
+    r.conclusion = r.becoming
+      ? r.becoming
+      : "A period worth sitting with. Carry the growth forward and keep tending the north star ahead.";
+  }
+
+  return r;
+}
 // Each topic is rendered as "your own words + the AI's read + what to do next"
 // (BLD-1006), with any verbatim quotes shown inside the section they came from
 // (BLD-1005). The report stays backward-compatible: every new field is optional
 // and legacy reports render fine when those fields are absent.
 
 function renderReport(report) {
+  return reportFramework(report) === "personal-development"
+    ? renderPersonalDevReport(report)
+    : renderJobReport(report);
+}
+
+function renderJobReport(report) {
   const root = document.getElementById("report-card") || document.getElementById("printable-report");
   root.innerHTML = "";
   const grade = gradeFor(report.overallScore);
@@ -618,9 +925,284 @@ function renderReport(report) {
   ]
     .filter(Boolean)
     .forEach((node) => root.appendChild(node));
-}
+    }
 
-// A topic = a full-width band with a heading, then a two-column split:
+    // ---------- Personal Development report rendering ----------
+    // Framework #2 (BLD-1012): a different schema from the Job Reflection report.
+    // Reuses the shared primitives (h, renderTopic, quoteNodes, renderConclusion,
+    // renderFooter) and the same report-card styling, but renders its own sections.
+
+    function renderPersonalDevHeader(report) {
+    const periodLabel = `${report.periodMonths}-month reflection`;
+    return h("div", { class: "report-card__header" }, [
+      h("div", { class: "report-card__header-top" }, [
+        h("div", { class: "report-card__brand" }, [
+          h("svg", { class: "report-card__brand-logo", width: "240", height: "56", viewBox: "0 0 280 64", fill: "none", xmlns: "http://www.w3.org/2000/svg", role: "img", "aria-label": "Reflectify" }, [
+            h("g", { transform: "translate(4, 4)" }, [
+              h("rect", { x: "0", y: "0", width: "56", height: "56", rx: "28", fill: "#EBF3EF" }),
+              h("path", { d: "M28 11 C 14 25, 14 39, 28 44 C 42 39, 42 25, 28 11 Z", fill: "#2D4A3E" }),
+              h("path", { d: "M28 19 C 38 26, 38 37, 28 41", stroke: "#E8A88A", "stroke-width": "3.5", "stroke-linecap": "round", fill: "none" }),
+            ]),
+            h("text", { x: "76", y: "44", "font-family": "Newsreader, Georgia, serif", "font-weight": "500", "font-size": "38", fill: "#2D4A3E", "letter-spacing": "-0.8" }, "Reflectify"),
+          ]),
+        ]),
+        h("span", { class: "report-card__period-badge" }, periodLabel),
+      ]),
+      h("div", { class: "report-card__header-main" }, [
+        h("div", { class: "report-card__title-group" }, [
+          h("div", { class: "report-card__season" }, `Season of ${report.season}`),
+          h("h1", { class: "report-card__title" }, "Personal Reflection"),
+          h("p", { class: "report-card__headline" }, report.lifeStory),
+        ]),
+      ]),
+    ]);
+    }
+
+    function renderValues(report) {
+    const v = report.values;
+    if (!v) return null;
+    const left = [
+      ...quoteNodes(report, "values", []),
+      h("div", { class: "report-card__values-pair" }, [
+        h("div", { class: "report-card__values-col" }, [
+          h("h6", { class: "report-card__label report-card__label--muted" }, "Values you claim"),
+          h("ul", { class: "report-card__suggest" }, (v.claimed || []).map((c) => h("li", {}, c))),
+        ]),
+        h("div", { class: "report-card__values-col" }, [
+          h("h6", { class: "report-card__label report-card__label--muted" }, "What you actually prioritized"),
+          h("ul", { class: "report-card__suggest" }, (v.actual || []).map((a) => h("li", {}, a))),
+        ]),
+      ]),
+    ];
+    const right = [
+      v.congruence ? h("p", { class: "report-card__note" }, v.congruence) : null,
+      ...(v.realignment && v.realignment.length
+        ? [
+            h("h6", { class: "report-card__label report-card__label--sub" }, "How to close the gap"),
+            h("ul", { class: "report-card__suggest" }, v.realignment.map((r) => h("li", {}, r))),
+          ]
+        : []),
+    ];
+    return renderTopic(1, "What you've valued", left, right, "Living by your values");
+    }
+
+    function renderGrowth(report) {
+    const growth = Array.isArray(report.growth) ? report.growth : [];
+    const left = [
+      ...quoteNodes(report, "growth", report.growth),
+      ...(growth.length
+        ? growth.map((g) =>
+            h("div", { class: "report-card__skill" }, [
+              h("div", { class: "report-card__skill-head" }, [
+                h("span", {}, g.quality),
+                h("span", {}, `${g.change > 0 ? "+" : ""}${g.change}`),
+              ]),
+              h("div", { class: "report-card__bar report-card__bar--growth" }, [
+                h("div", { class: "report-card__bar-fill", style: `width:${g.pct}` }),
+              ]),
+            ])
+          )
+        : [h("p", { class: "report-card__empty" }, "No growth areas recorded this period.")]),
+    ];
+    const right = [
+      report.growthAnalysis ? h("p", { class: "report-card__note" }, report.growthAnalysis) : null,
+    ];
+    if (!growth.length && !report.growthAnalysis) return null;
+    return renderTopic(2, "How you've grown", left, right, "Analysis & what it points to");
+    }
+
+    function renderShed(report) {
+    const shed = Array.isArray(report.shed) ? report.shed : [];
+    const left = [
+      ...quoteNodes(report, "shed", report.shed),
+      ...(shed.length
+        ? shed.map((s) =>
+            h("div", { class: "report-card__shed-item" }, [
+              h("h5", { class: "report-card__item-title" }, s.item),
+              s.cost ? h("p", { class: "report-card__item-detail" }, `What it cost: ${s.cost}`) : null,
+              s.freed ? h("p", { class: "report-card__item-detail" }, `What it freed: ${s.freed}`) : null,
+            ])
+          )
+        : [h("p", { class: "report-card__empty" }, "Nothing shed this period.")]),
+    ];
+    const right = [
+      report.shedAnalysis ? h("p", { class: "report-card__note" }, report.shedAnalysis) : null,
+    ];
+    if (!shed.length && !report.shedAnalysis) return null;
+    return renderTopic(3, "What you've shed or outgrown", left, right, "Analysis & what letting go made room for");
+    }
+
+    function renderPatterns(report) {
+    const patterns = Array.isArray(report.patterns) ? report.patterns : [];
+    const left = [
+      ...quoteNodes(report, "patterns", report.patterns),
+      ...(patterns.length
+        ? patterns.map((p) =>
+            h("div", { class: "report-card__shed-item" }, [
+              h("h5", { class: "report-card__item-title" }, p.name),
+              p.moment ? h("p", { class: "report-card__item-detail" }, p.moment) : null,
+              p.quote ? h("p", { class: "report-card__inline-quote" }, `“${p.quote}”`) : null,
+            ])
+          )
+        : [h("p", { class: "report-card__empty" }, "No recurring patterns recorded this period.")]),
+    ];
+    const right = [
+      report.patternsAnalysis ? h("p", { class: "report-card__note" }, report.patternsAnalysis) : null,
+      ...(report.patternDirections && report.patternDirections.length
+        ? [
+            h("h6", { class: "report-card__label report-card__label--sub" }, "Directions to practise"),
+            h("ul", { class: "report-card__suggest" }, report.patternDirections.map((d) => h("li", {}, d))),
+          ]
+        : []),
+    ];
+    if (!patterns.length && !report.patternsAnalysis) return null;
+    return renderTopic(4, "Patterns that hold you back", left, right, "Analysis & what to practise");
+    }
+
+    function renderRelationships(report) {
+    const rel = report.relationships;
+    if (!rel) return null;
+    const left = [
+      ...quoteNodes(report, "relationships", []),
+      rel.note ? h("p", { class: "report-card__item-detail" }, rel.note) : null,
+    ];
+    const right = [
+      rel.balance ? h("p", { class: "report-card__note" }, rel.balance) : null,
+      ...(rel.suggestions && rel.suggestions.length
+        ? [
+            h("h6", { class: "report-card__label report-card__label--sub" }, "Ways to rebalance"),
+            h("ul", { class: "report-card__suggest" }, rel.suggestions.map((s) => h("li", {}, s))),
+          ]
+        : []),
+    ];
+    return renderTopic(5, "How you show up with others", left, right, "Analysis & how to rebalance");
+    }
+
+    function renderWholeWellbeing(report) {
+    const w = report.wellbeing;
+    if (!w) return null;
+    const left = [
+      h("div", { class: "report-card__skill" }, [
+        h("div", { class: "report-card__skill-head" }, [
+          h("span", {}, "Whole-life wellbeing"),
+          h("span", {}, String(w.score)),
+        ]),
+        h("div", { class: "report-card__bar" }, [
+          h("div", { class: "report-card__bar-fill", style: `width:${w.pct}` }),
+        ]),
+      ]),
+      w.draining ? h("p", { class: "report-card__item-detail" }, `Draining: ${w.draining}`) : null,
+      w.refilling ? h("p", { class: "report-card__item-detail" }, `Refilling: ${w.refilling}`) : null,
+    ];
+    const right = [
+      ...(w.suggestions && w.suggestions.length
+        ? [
+            h("h6", { class: "report-card__label report-card__label--sub" }, "Ways to refill"),
+            h("ul", { class: "report-card__suggest" }, w.suggestions.map((s) => h("li", {}, s))),
+          ]
+        : []),
+    ];
+    return renderTopic(6, "Energy & whole-life wellbeing", left, right, "How to refill");
+    }
+
+    function renderBecoming(report) {
+    const b = report.becoming || "";
+    const ns = report.northStar;
+    const left = [
+      ...quoteNodes(report, "becoming", []),
+      b ? h("p", { class: "report-card__item-detail" }, b) : null,
+    ];
+    const right = [];
+    if (ns && (ns.commitment || ns.why || ns.measure)) {
+      right.push(h("h6", { class: "report-card__label report-card__label--sub" }, "North star commitment"));
+      if (ns.commitment) right.push(h("h5", { class: "report-card__direction-role" }, ns.commitment));
+      if (ns.why) right.push(h("p", { class: "report-card__note" }, ns.why));
+      if (ns.measure) {
+        right.push(
+          h("p", { class: "report-card__measure" }, [
+            h("span", { class: "report-card__measure-tag" }, "How you'll know"),
+            ns.measure,
+          ])
+        );
+      }
+      if (ns.suggestions && ns.suggestions.length) {
+        right.push(
+          h("ul", { class: "report-card__suggest" }, ns.suggestions.map((s) => h("li", {}, s)))
+        );
+      }
+    }
+    if (!b && !right.length) return null;
+    return renderTopic(7, "Who you're becoming", left, right, "Your north star");
+    }
+
+    function renderDevSentiment(report) {
+    const s = report.sentiment;
+    if (!s) return null;
+    const positives = Array.isArray(s.positives) ? s.positives : [];
+    const tensions = Array.isArray(s.tensions) ? s.tensions : [];
+    const children = [
+      h("div", { class: "report-card__sentiment-main" }, [
+        h("div", { class: "report-card__sentiment-meta" }, [
+          h("h6", { class: "report-card__label" }, "Sentiment"),
+          h("div", { class: "report-card__sentiment-value" }, s.label),
+        ]),
+        h("div", { class: "report-card__sentiment-meter" }, [
+          h("div", { class: "report-card__bar report-card__bar--sentiment" }, [
+            h("div", { class: "report-card__bar-fill", style: `width:${s.pct}` }),
+          ]),
+          h("span", { class: "report-card__sentiment-score" }, String(s.score)),
+        ]),
+      ]),
+      s.note ? h("p", { class: "report-card__sentiment-note" }, s.note) : null,
+    ];
+    if (positives.length || tensions.length) {
+      children.push(
+        h("div", { class: "report-card__sentiment-signals" }, [
+          positives.length
+            ? h("div", { class: "report-card__signal report-card__signal--pos" }, [
+                h("span", { class: "report-card__signal-tag" }, "Keep doing"),
+                h("ul", { class: "report-card__suggest" }, positives.map((p) => h("li", {}, p))),
+              ])
+            : null,
+          tensions.length
+            ? h("div", { class: "report-card__signal report-card__signal--neg" }, [
+                h("span", { class: "report-card__signal-tag" }, "Watch out for"),
+                h("ul", { class: "report-card__suggest" }, tensions.map((t) => h("li", {}, t))),
+              ])
+            : null,
+        ])
+      );
+    }
+    return h("div", { class: "report-card__sentiment" }, children);
+    }
+
+    function renderPersonalDevReport(report) {
+    const root = document.getElementById("report-card") || document.getElementById("printable-report");
+    root.innerHTML = "";
+    const generatedDate = new Date().toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    [
+      renderPersonalDevHeader(report),
+      renderDevSentiment(report),
+      renderValues(report),
+      renderGrowth(report),
+      renderShed(report),
+      renderPatterns(report),
+      renderRelationships(report),
+      renderWholeWellbeing(report),
+      renderBecoming(report),
+      renderConclusion(report),
+      renderFooter(generatedDate),
+    ]
+      .filter(Boolean)
+      .forEach((node) => root.appendChild(node));
+    }
+
+    // A topic = a full-width band with a heading, then a two-column split:
 // left  = the user's own reflection (items + their verbatim quotes)
 // right = the AI analysis + personalized recommendations
 function renderTopic(index, title, leftCol, rightCol, rightHeading = "Analysis & next steps") {
@@ -977,7 +1559,8 @@ function sanitizeFilename(str) {
 }
 
 function filenameFor(extension) {
-  const job = sanitizeFilename(currentReport.jobTitle);
+  const isDev = reportFramework(currentReport) === "personal-development";
+  const job = sanitizeFilename(isDev ? "personal-development-reflection" : currentReport.jobTitle);
   const date = new Date().toISOString().slice(0, 10);
   return `reflect-card-${job}-${date}.${extension}`;
 }

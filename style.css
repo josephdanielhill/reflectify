@@ -630,6 +630,7 @@ textarea.input {
   align-items: flex-start;
   gap: var(--space-3);
   width: 100%;
+  flex: 1;
   padding: 0 0 var(--space-4);
   font: inherit;
   color: inherit;
@@ -653,6 +654,21 @@ textarea.input {
   font-size: 22px;
   line-height: 1.15;
 }
+.tool-card__alpha {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d0342c;
+  background: rgba(208, 52, 44, 0.12);
+  border: 1px solid rgba(208, 52, 44, 0.4);
+  padding: 2px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 2px;
+}
 .tool-card__desc {
   font-size: 13px;
   opacity: 0.75;
@@ -662,9 +678,12 @@ textarea.input {
 .tool-card__cta-wrap {
   margin-top: var(--space-3);
   display: flex;
+  justify-content: center;
+  width: 100%;
 }
 .tool-card__btn {
-  width: 100%;
+  width: auto;
+  min-width: 200px;
   padding: 10px 20px;
   font-size: 14px;
 }
@@ -672,6 +691,7 @@ textarea.input {
   display: block;
   font-size: 12px;
   padding: 0 var(--space-4) var(--space-4);
+  text-align: center;
 }
 .tool-card--placeholder {
   padding: 0 0 var(--space-4);
@@ -1407,6 +1427,57 @@ textarea.input {
   line-height: 1.5;
   color: var(--color-neutral-600);
 }
+
+/* Personal Development Reflection framework (BLD-1012) */
+.report-card__season {
+  display: inline-block;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent-800);
+  background: var(--color-mint-light);
+  border-radius: 4px;
+  padding: 3px 8px;
+  margin-bottom: 10px;
+}
+.report-card__values-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .report-card__values-pair {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+.report-card__values-col {
+  background: var(--color-neutral-100);
+  border-radius: 8px;
+  padding: 12px;
+}
+.report-card__bar--growth .report-card__bar-fill {
+  background: var(--color-accent-500);
+}
+.report-card__shed-item {
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--color-neutral-100);
+  border-radius: 8px;
+  border-left: 3px solid var(--color-accent-400);
+}
+.report-card__shed-item .report-card__item-title {
+  margin-bottom: 4px;
+}
+.report-card__shed-item .report-card__item-detail {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-neutral-600);
+}
+
 
 /* ---------- Print ---------- */
 
