@@ -123,7 +123,7 @@ const TOOLS = [
   {
     id: "personal-development",
     icon: "🌱",
-    name: "Personal Development Reflection",
+    name: "Personal Reflection",
     image: "illustration-personal-development-reflection.jpg",
     alpha: true,
     description:
@@ -951,7 +951,7 @@ function renderJobReport(report) {
       h("div", { class: "report-card__header-main" }, [
         h("div", { class: "report-card__title-group" }, [
           h("div", { class: "report-card__season" }, `Season of ${report.season}`),
-          h("h1", { class: "report-card__title" }, "Personal Development Reflection"),
+          h("h1", { class: "report-card__title" }, "Personal Reflection"),
           h("p", { class: "report-card__headline" }, report.lifeStory),
         ]),
       ]),
