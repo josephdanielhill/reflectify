@@ -17,6 +17,11 @@ FATHOM_SCRIPT_HOST = "cdn.usefathom.com/script.js"
 
 # Any of these hosts appearing in a third-party <script src> would mean an
 # unannounced tracker slipped in.
+SUPPORT_CONTACT_URL = "https://tally.so/r/zxNrGM"
+SUPPORT_CONTACT_EMAIL = "inbx@josephhill.co"
+
+# Any of these hosts appearing in a third-party <script src> would mean an
+# unannounced tracker slipped in.
 DISALLOWED_HOSTS = (
     "googletagmanager.com",
     "google-analytics.com",
@@ -104,6 +109,19 @@ class FathomSnippetTest(unittest.TestCase):
                     ),
                     f"{page.name}: Fathom block is missing or malformed",
                 )
+
+
+    def test_privacy_page_uses_tally_contact_not_email(self):
+        """Review feedback (BLD-1019): remove Joseph's personal email from the
+        privacy page; use the Tally feedback link instead."""
+        text = (REPO_ROOT / "privacy.html").read_text(encoding="utf-8")
+        self.assertIn(SUPPORT_CONTACT_URL, text, "privacy page must link the Tally form")
+        self.assertNotIn(
+            SUPPORT_CONTACT_EMAIL,
+            text,
+            "privacy page must not expose Joseph's personal email",
+        )
+        self.assertNotIn("mailto:", text, "no mailto: links on the privacy page")
 
 
 if __name__ == "__main__":
