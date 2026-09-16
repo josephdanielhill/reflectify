@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!--
+  Reflectify — Feature / workflow marketing card  (BLD-1023, parent BLD-1021)
+  Source: 1080 x 1080  ->  rendered 1x (1080x1080) and 2x (2160x2160)
+  Brand tokens from ~/reflectify/style.css (PRV-5). Do not invent colours.
+  Render:  ./render-cards.sh feature
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reflectify — Feature marketing card</title>
+<style>
+  @font-face { font-family:"Newsreader"; font-style:normal; font-weight:200 800; font-display:block;
+    src:url("../vendor/fonts/newsreader-latin-variable.woff2") format("woff2"); }
+  @font-face { font-family:"Inter"; font-style:normal; font-weight:100 900; font-display:block;
+    src:url("../vendor/fonts/inter-latin-variable.woff2") format("woff2"); }
+
+  :root {
+    --paper:#F7F5F0;  --ink:#1E2421;  --moss:#2D4A3E;
+    --mist:#EBF3EF;   --eucalyptus:#8CAE9E;
+    --surface:#FFFFFF; --hairline:#E9E7E1;
+    --neutral-300:#D8D4CC; --neutral-500:#978F80; --neutral-700:#585249;
+    --font-display:"Newsreader", Georgia, "Times New Roman", serif;
+    --font-body:"Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1080px; }
+  body { background:var(--paper); }
+
+  .card {
+    position:relative;
+    width:1080px; height:1080px;
+    background:var(--paper);
+    overflow:hidden;
+    padding:84px 88px;
+    display:flex; flex-direction:column;
+    justify-content:space-between;
+  }
+
+  /* ---------------- header ---------------- */
+  .card__brand svg { height:30px; width:auto; display:block; }
+
+  .card__heading {
+    font-family:var(--font-display); font-weight:500;
+    font-size:58px; line-height:1.02; letter-spacing:-.02em;
+    color:var(--ink);
+    margin-top:34px;
+  }
+  .card__sub {
+    font-family:var(--font-body); font-size:20px; line-height:1.55;
+    color:var(--neutral-700);
+    margin-top:16px; max-width:620px;
+  }
+
+  /* ---------------- editorial timeline ---------------- */
+  .timeline { margin-top:34px; }
+  .step {
+    display:flex; align-items:flex-start; gap:26px;
+    padding:17px 0;
+  }
+  .step + .step { border-top:1px solid var(--neutral-300); }
+
+  .step__tile {
+    flex:0 0 62px; width:62px; height:62px;
+    position:relative; border-radius:18px;
+    background:var(--mist);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .step__leaf { position:absolute; inset:0; display:block; }
+  .step__glyph { position:relative; display:block; }
+
+  .step__body { flex:1 1 auto; padding-top:2px; }
+  .step__label {
+    font-family:var(--font-body); font-size:11px; font-weight:700;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--eucalyptus);
+  }
+  .step__title {
+    font-family:var(--font-display); font-weight:500;
+    font-size:29px; line-height:1.1; letter-spacing:-.01em;
+    color:var(--ink); margin-top:6px;
+  }
+  .step__desc {
+    font-family:var(--font-body); font-size:15.5px; line-height:1.5;
+    color:var(--neutral-700); margin-top:8px; max-width:600px;
+  }
+
+  /* ---------------- payoff panel ---------------- */
+  .payoff {
+    margin-top:28px;
+    background:var(--surface);
+    border:1px solid var(--hairline);
+    border-radius:26px;
+    padding:30px 34px;
+    display:grid;
+    grid-template-columns:1.15fr 1fr 1.35fr;
+    gap:0;
+  }
+  .payoff__cell { padding:0 26px; }
+  .payoff__cell:first-child { padding-left:0; }
+  .payoff__cell:last-child { padding-right:0; }
+  .payoff__cell + .payoff__cell { border-left:1px solid var(--hairline); }
+
+  .payoff__label {
+    font-family:var(--font-body); font-size:10.5px; font-weight:700;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--neutral-500);
+  }
+
+  .score__value {
+    font-family:var(--font-display); font-weight:500;
+    font-size:40px; line-height:1; letter-spacing:-.02em;
+    color:var(--moss); margin-top:12px;
+  }
+  .score__value span { font-size:20px; color:var(--neutral-500); }
+  .score__bars { margin-top:16px; display:flex; flex-direction:column; gap:9px; }
+  .score__bar { height:6px; border-radius:99px; background:var(--neutral-300); overflow:hidden; }
+  .score__bar > i { display:block; height:100%; border-radius:99px; background:var(--moss); }
+
+  .radar { margin-top:10px; display:block; }
+
+  .quote__mark {
+    font-family:var(--font-display); font-size:44px; line-height:.7;
+    color:var(--eucalyptus); display:block; margin-top:14px;
+  }
+  .quote__text {
+    font-family:var(--font-display); font-style:italic; font-weight:400;
+    font-size:19.5px; line-height:1.42; color:var(--ink);
+    margin-top:6px;
+    display:block;
+  }
+  .quote__attr {
+    font-family:var(--font-body); font-size:13px; font-weight:500;
+    color:var(--neutral-500); margin-top:12px; display:block;
+  }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+
+    <header>
+      <div class="card__brand" data-check>
+        <svg viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reflectify">
+          <g transform="translate(10, 10)">
+            <rect x="0" y="0" width="40" height="40" rx="20" fill="#EBF3EF" />
+            <path d="M20 8 C 10 18, 10 28, 20 34 C 30 28, 30 18, 20 8 Z" fill="#2D4A3E" />
+            <path d="M20 14 C 27 19, 27 27, 20 31" stroke="#E8A88A" stroke-width="2.5" stroke-linecap="round" fill="none" />
+          </g>
+          <text x="62" y="38" font-family="'Newsreader', Georgia, serif" font-weight="500" font-size="28" fill="#2D4A3E" letter-spacing="-0.5">Reflectify</text>
+        </svg>
+      </div>
+      <h1 class="card__heading" data-check>Three quiet steps,<br>one clear summary.</h1>
+      <p class="card__sub" data-check>Bring your own AI chat. No account, no login — your reflection stays yours.</p>
+    </header>
+
+    <div class="timeline" data-check>
+
+      <div class="step">
+        <div class="step__tile">
+          <svg class="step__leaf" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M20 6 C 8 18, 8 30, 20 36 C 32 30, 32 18, 20 6 Z" fill="#2D4A3E" fill-opacity=".10"/>
+          </svg>
+          <svg class="step__glyph" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <path d="M4 7.5 11 13l-7 5.5" stroke="#2D4A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 19.5h7" stroke="#2D4A3E" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="step__body">
+          <div class="step__label">Step 1</div>
+          <div class="step__title">Copy the guided prompt</div>
+          <div class="step__desc">Paste it into ChatGPT, Claude, Gemini or any AI chat you already use.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step__tile">
+          <svg class="step__leaf" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M20 6 C 8 18, 8 30, 20 36 C 32 30, 32 18, 20 6 Z" fill="#2D4A3E" fill-opacity=".10"/>
+          </svg>
+          <svg class="step__glyph" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <path d="M13 17.5V5.5M8 10.5 13 5.5l5 5" stroke="#2D4A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.5 16.5v3a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5v-3" stroke="#2D4A3E" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="step__body">
+          <div class="step__label">Step 2</div>
+          <div class="step__title">Upload the reflection JSON</div>
+          <div class="step__desc">Drop in the structured summary your AI hands back at the end of the interview.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step__tile">
+          <svg class="step__leaf" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M20 6 C 8 18, 8 30, 20 36 C 32 30, 32 18, 20 6 Z" fill="#2D4A3E" fill-opacity=".10"/>
+          </svg>
+          <svg class="step__glyph" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <path d="M13 4.5 15.3 11 21.8 13.3 15.3 15.6 13 22.1 10.7 15.6 4.2 13.3 10.7 11Z" fill="#2D4A3E"/>
+          </svg>
+        </div>
+        <div class="step__body">
+          <div class="step__label">Step 3</div>
+          <div class="step__title">Generate your summary</div>
+          <div class="step__desc">A designed reflection — scores, radar, quotes, milestones — ready to keep.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="payoff" data-check>
+
+      <div class="payoff__cell">
+        <div class="payoff__label">Score breakdown</div>
+        <div class="score__value">7.8<span> / 10</span></div>
+        <div class="score__bars">
+          <div class="score__bar"><i style="width:82%"></i></div>
+          <div class="score__bar"><i style="width:74%"></i></div>
+          <div class="score__bar"><i style="width:63%"></i></div>
+        </div>
+      </div>
+
+      <div class="payoff__cell">
+        <div class="payoff__label">Skill radar</div>
+        <svg class="radar" width="118" height="118" viewBox="0 0 130 130" fill="none" aria-hidden="true">
+          <g stroke="#D8D4CC" stroke-width="1.4">
+            <polygon points="65,20 108,51 92,102 38,102 22,51" />
+            <polygon points="65,38 95,60 83,93 47,93 35,60" />
+            <path d="M65 20V65M108 51 65 65M92 102 65 65M38 102 65 65M22 51 65 65" />
+          </g>
+          <polygon points="65,26 101,55 88,97 45,98 28,55"
+                   fill="#2D4A3E" fill-opacity=".14" stroke="#2D4A3E" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="65" cy="65" r="3" fill="#2D4A3E" />
+        </svg>
+      </div>
+
+      <div class="payoff__cell">
+        <div class="payoff__label">Quote highlights</div>
+        <span class="quote__mark">&ldquo;</span>
+        <span class="quote__text">The clearest view of how I actually work — not how I assume I do.</span>
+        <span class="quote__attr">Job Reflection &middot; sample summary</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    window.__cardReady = (async () => {
+      await document.fonts.ready;
+      await document.fonts.load('500 58px Newsreader');
+      await document.fonts.load('400 20px Inter');
+      await document.fonts.load('italic 400 19.5px Newsreader');
+      return document.fonts.check('500 58px Newsreader') && document.fonts.check('400 20px Inter');
+    })();
+    // Layout audit (?audit / #audit): measured rects + overflow, dumped as JSON for CI.
+    if (location.hash === '#audit' || location.search.indexOf('audit') > -1) {
+      window.__cardReady.then(() => {
+        const card = document.getElementById('card');
+        const cb = card.getBoundingClientRect();
+        const rects = [...document.querySelectorAll('[data-check]')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return {
+            sel: el.className || el.tagName,
+            x: +r.x.toFixed(1), y: +r.y.toFixed(1),
+            w: +r.width.toFixed(1), h: +r.height.toFixed(1),
+            right: +r.right.toFixed(1), bottom: +r.bottom.toFixed(1),
+            insideCanvas: r.x >= -0.5 && r.y >= -0.5 && r.right <= cb.width + 0.5 && r.bottom <= cb.height + 0.5,
+          };
+        });
+        const pre = document.createElement('pre');
+        pre.id = '__audit';
+        pre.textContent = JSON.stringify({
+          canvas: { w: cb.width, h: cb.height },
+          fontsLoaded: document.fonts.check('500 58px Newsreader') && document.fonts.check('400 20px Inter'),
+          cardOverflow: { scrollW: card.scrollWidth, clientW: card.clientWidth, scrollH: card.scrollHeight, clientH: card.clientHeight },
+          bodyOverflow: { scrollW: document.body.scrollWidth, scrollH: document.body.scrollHeight },
+          rects,
+        });
+        document.body.appendChild(pre);
+      });
+    }
+  </script>
+</body>
+</html>
