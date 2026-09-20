@@ -1769,6 +1769,22 @@ textarea.input {
   color: var(--color-neutral-600);
 }
 
+.landing-process__privacy {
+  margin-top: 28px;
+  padding: 16px 20px;
+  border: 1px solid rgba(45, 74, 62, 0.12);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-neutral-600);
+}
+
+.landing-process__privacy strong {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
 .landing-process__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

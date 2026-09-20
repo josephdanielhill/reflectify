@@ -110,7 +110,6 @@ class FathomSnippetTest(unittest.TestCase):
                     f"{page.name}: Fathom block is missing or malformed",
                 )
 
-
     def test_privacy_page_uses_tally_contact_not_email(self):
         """Review feedback (BLD-1019): remove Joseph's personal email from the
         privacy page; use the Tally feedback link instead."""
@@ -122,6 +121,65 @@ class FathomSnippetTest(unittest.TestCase):
             "privacy page must not expose Joseph's personal email",
         )
         self.assertNotIn("mailto:", text, "no mailto: links on the privacy page")
+
+
+class PositioningCopyTest(unittest.TestCase):
+    """Regression tests for BLD-1028: hero/how-it-works copy must lead with the
+    differentiator (structured, exportable report artifact) and state the
+    privacy promise accurately."""
+
+    def setUp(self):
+        self.text = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+
+    def test_hero_leads_with_report_artifact(self):
+        """Hero must frame value as turning an AI conversation into a report,
+        not just 'clear insights'."""
+        self.assertIn(
+            "Turn any AI conversation into a beautiful, actionable report.",
+            self.text,
+            "hero H1 must lead with the report artifact",
+        )
+        self.assertIn(
+            "print-worthy report",
+            self.text,
+            "hero lede must mention the print-worthy report payoff",
+        )
+        self.assertIn(
+            "export as a PDF or share as a screenshot",
+            self.text,
+            "hero lede must name the shareable PDF/screenshot payoff",
+        )
+
+    def test_how_it_works_leads_with_differentiator(self):
+        self.assertIn(
+            "Three steps to a report worth keeping",
+            self.text,
+            "how-it-works title must lead with the report artifact",
+        )
+        self.assertIn(
+            "Generate &amp; Share Your Report",
+            self.text,
+            "step 3 must frame the shareable report as the payoff",
+        )
+
+    def test_privacy_note_states_promise_accurately(self):
+        """The privacy note must distinguish the local report from the
+        interview that runs on the user's chosen LLM provider."""
+        self.assertIn(
+            "landing-process__privacy",
+            self.text,
+            "privacy note element must be present",
+        )
+        self.assertIn(
+            "the interview runs on the AI chat tool you choose",
+            self.text,
+            "privacy note must state the interview runs on the user's LLM provider",
+        )
+        self.assertIn(
+            "never leaves your device",
+            self.text,
+            "privacy note must state the report stays local",
+        )
 
 
 if __name__ == "__main__":
