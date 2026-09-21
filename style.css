@@ -1778,6 +1778,9 @@ textarea.input {
   font-size: 15px;
   line-height: 1.6;
   color: var(--color-neutral-600);
+  /* Match the width of a single panel in the 3-column grid above so the
+     "Your Privacy" box doesn't outgrow the three panels it sits beneath. */
+  width: calc((100% - 64px) / 3);
 }
 
 .landing-process__privacy strong {
@@ -2138,6 +2141,9 @@ textarea.input {
   }
   .landing-process__grid {
     grid-template-columns: 1fr;
+  }
+  .landing-process__privacy {
+    width: 100%;
   }
   .landing-hero__text .landing__title {
     font-size: 38px;
