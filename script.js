@@ -9,6 +9,7 @@ Then run a guided interview covering, roughly in this order:
 2. Regrets or missed opportunities - what would I do differently?
 3. Challenges I faced and how I handled them
 4. Skills I grew - ask me to name 4-6 skills and rate my growth in each from 0-10 (one decimal place allowed)
+4b. Competency radar - ask me to name the 6-8 competencies this role actually demands and rate, for each, my current level from 1-5 and the level the role expects from 1-5 (e.g. "React: I'm a 4, this role expects a 5"). Also name any competencies the role demands for which I have no evidence - those go into radar.unscored_competencies.
 5. Relationships & collaboration - who did I work well with, any friction worth noting?
 6. Energy & wellbeing - how has my energy/burnout trended? Ask for a 0-10 score (one decimal place allowed) and a short note
 7. Goals for the next period
@@ -35,6 +36,16 @@ When the interview is complete, respond with ONLY a single JSON code block (no o
   "skills": [{ "name": "string", "level": number }], // 0-10, one decimal place allowed
   "skillsAnalysis": "string", // 2-3 sentences on what my skill growth (or stagnation) suggests
   "skillDirections": [{ "role": "string", "reason": "string" }], // 2-3 role directions that fit my strongest demonstrated skills (e.g. a visual-design strength -> UI/product roles), each with a one-line reason grounded in my answers
+  "radar": { // optional - competency radar (BLD-1025). Axes = the competencies this role actually demands, not generic skills.
+    "role_title": "string",           // the role these requirements belong to (omit to default to jobTitle)
+    "benchmark_basis": "job_posting", // where the role benchmark levels came from: "job_posting" | "self_assessed" | "ai_estimate"
+    "axes": [ { "competency": "string",
+                "requirement_weight": number, // relative importance in the role, 0-1 (optional, default 1)
+                "candidate_score": number,    // 1-5, my current level (use 0 when I have no evidence)
+                "role_benchmark": number,     // 1-5, the level this role expects
+                "coverage_pct": number } ],   // = round(candidate_score / role_benchmark * 100); optional, the renderer recomputes it if missing
+    "unscored_competencies": [ "string" ]     // competencies the role demands for which I had no candidate evidence
+  },
   "quotes": [{ "section": "string", "text": "string" }], // 3-6 short first-person quotes pulled verbatim from my answers, each tagged with the section it belongs to (one of: achievements, challenges, regrets, skills, goals, wellbeing). Use quotes[].section and quotes[].text
   "goals": [{ "title": "string", "detail": "string", "measure": "string", "suggestion": "string", "quote": "string" }], // measure = how I'll know the goal is met; suggestion = a personalized action to help reach it
   "goalsAnalysis": "string", // 2-3 sentences on whether these goals address what came up in the interview
@@ -227,6 +238,24 @@ const SAMPLE_REPORT = {
     { role: "Design lead / Staff designer", reason: "Your systems thinking and stakeholder communication already carry a senior cross-functional voice." },
     { role: "Product design roles on complex flows", reason: "The checkout win shows you thrive on untangling high-stakes, multi-step experiences." },
   ],
+  // Competency radar (BLD-1025): role-demand axes with a 1-5 scale and % of
+  // the role's expected level per axis (the denominator that kills "42 out of
+  // what?"). Unscored competencies render as insufficient-evidence markers.
+  radar: {
+    role_title: "Senior Product Designer",
+    benchmark_basis: "job_posting",
+    axes: [
+      { competency: "Systems thinking", requirement_weight: 1.0, candidate_score: 4, role_benchmark: 5 },
+      { competency: "Stakeholder comms", requirement_weight: 0.9, candidate_score: 4, role_benchmark: 4, coverage_pct: 100 },
+      { competency: "Design systems", requirement_weight: 0.8, candidate_score: 3, role_benchmark: 4 },
+      { competency: "User research", requirement_weight: 0.8, candidate_score: 4, role_benchmark: 4 },
+      { competency: "Prototyping", requirement_weight: 0.7, candidate_score: 4, role_benchmark: 4, coverage_pct: 100 },
+      { competency: "Motion design", requirement_weight: 0.5, candidate_score: 3, role_benchmark: 3 },
+      { competency: "Delegation", requirement_weight: 0.6, candidate_score: 2, role_benchmark: 4 },
+      { competency: "Accessibility", requirement_weight: 0.7, candidate_score: 3, role_benchmark: 5 },
+    ],
+    unscored_competencies: ["Design engineering"],
+  },
   quotes: [
     { section: "achievements", text: "I finally understand why the old checkout kept losing people, and I actually fixed it." },
     { section: "challenges", text: "I kept saying yes because I didn't want to seem like I couldn't handle it." },
@@ -392,7 +421,12 @@ document.querySelectorAll("[data-nav]").forEach((el) => {
 // ---------- DOM builder ----------
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const SVG_TAGS = new Set(["svg", "g", "rect", "path", "text", "circle", "defs", "use", "clipPath", "linearGradient", "stop"]);
+// Note: polygon/line/title were UNKNOWN to the DOM stubs historically — if a
+// tag is missing from this set, `h()` creates an HTML element instead of an
+// SVG one, and the browser silently refuses to draw it. That caused the
+// BLD-1025 radar to render only dots+labels with no polygon shapes (the whole
+// chart). Keep every SVG element the renderers emit in this set.
+const SVG_TAGS = new Set(["svg", "g", "rect", "path", "text", "circle", "polygon", "line", "title", "defs", "use", "clipPath", "linearGradient", "stop"]);
 
 function h(tag, attrs = {}, children = []) {
   const el = SVG_TAGS.has(tag)
@@ -422,6 +456,9 @@ function toolEventName(tool, action) {
 
 function initToolGrid() {
   const grid = document.getElementById("tool-grid");
+  // BLD-1049: tag the grid with the active-tool count so CSS can lay the cards
+  // out in equal columns that fill the container width (no narrow auto-fit gaps).
+  grid.classList.add("tool-grid--" + TOOLS.length);
 
   TOOLS.forEach((tool) => {
     const cardMedia = tool.image
@@ -742,6 +779,31 @@ function validateJobReport(data) {
     }
   });
 
+  // Competency radar (BLD-1025): optional, and lenient — malformed radar blocks
+  // *only* the radar section, never the whole report.
+  if (data.radar !== undefined && data.radar !== null && !isObj(data.radar)) {
+    errors.push('"radar" must be an object if present.');
+  }
+  if (isObj(data.radar)) {
+    if (data.radar.axes !== undefined && !Array.isArray(data.radar.axes)) {
+      errors.push('"radar.axes" must be an array if present.');
+    }
+    validateOptionalArray(data.radar.axes, "radar.axes", errors, (item, path, errs) => {
+      if (typeof item.competency !== "string" || !item.competency.trim()) {
+        errs.push(`"${path}.competency" must be a non-empty string.`);
+      }
+      if (
+        (item.candidate_score !== undefined && (typeof item.candidate_score !== "number" || item.candidate_score < 0 || item.candidate_score > 5)) ||
+        (item.role_benchmark !== undefined && (typeof item.role_benchmark !== "number" || item.role_benchmark < 1 || item.role_benchmark > 5))
+      ) {
+        errs.push(`"${path}" candidate_score must be 0-5 and role_benchmark 1-5.`);
+      }
+    });
+    validateOptionalArray(data.radar.unscored_competencies, "radar.unscored_competencies", errors, (item, path, errs) => {
+      if (typeof item !== "string" || !item.trim()) errs.push(`"${path}" must be a non-empty string.`);
+    });
+  }
+
   if (data.quotes !== undefined && !Array.isArray(data.quotes)) {
     errors.push('"quotes" must be an array if present.');
   }
@@ -892,6 +954,84 @@ function validateOptionalArray(arr, name, errors, itemValidator) {
   });
 }
 
+// ---------- Competency radar (BLD-1025) ----------
+// Maps job-demand competencies (1-5) onto candidate evidence (1-5) as a
+// "% of the role's expected level", so every number carries its denominator
+// - no bare "42 out of what?". These helpers are pure (DOM-free) so the
+// parser harness can unit-test them.
+
+const RADAR_MAX_AXES = 8; // a radar beyond 8 axes is unreadable
+const RADAR_MIN_AXES = 3; // below 3, fall back to bars
+
+function radarCoveragePct(candidateScore, roleBenchmark) {
+  if (!Number.isFinite(roleBenchmark) || roleBenchmark <= 0) return 0;
+  const cand = Number.isFinite(candidateScore) ? candidateScore : 0;
+  return Math.round((cand / roleBenchmark) * 100);
+}
+
+function normalizeRadarAxis(axis) {
+  const candidate = Math.max(0, Math.min(5, Number(axis.candidate_score) || 0));
+  const benchmark = Math.max(1, Math.min(5, Number(axis.role_benchmark) || 1));
+  const weight = Number(axis.requirement_weight);
+  return {
+    competency: axis.competency,
+    requirement_weight: Number.isFinite(weight) ? weight : 1,
+    candidate_score: candidate,
+    role_benchmark: benchmark,
+    coverage_pct: radarCoveragePct(candidate, benchmark),
+  };
+}
+
+// Decide which axes go on the figure. Rules (BLD-1025):
+//  * only axes with a competency name and a valid 1-5 benchmark are "scored"
+//  * sort by requirement_weight (highest first)
+//  * cap at 8; well-formed surplus axes are dropped but their names are kept
+//    as unscored so nothing silently disappears.
+function selectRadarAxes(rawAxes) {
+  if (!Array.isArray(rawAxes)) return { axes: [], unscored: [] };
+  const scored = [];
+  const unscored = [];
+  for (const a of rawAxes) {
+    if (!a || typeof a !== "object") continue;
+    const competency = typeof a.competency === "string" ? a.competency.trim() : "";
+    if (!competency) continue;
+    const benchmark = Number(a.role_benchmark);
+    const hasScore = Number.isFinite(Number(a.candidate_score)) && Number(a.candidate_score) > 0;
+    if (hasScore && Number.isFinite(benchmark) && benchmark >= 1 && benchmark <= 5) {
+      scored.push(a);
+    } else {
+      unscored.push(competency);
+    }
+  }
+  scored.sort((x, y) => (Number(y.requirement_weight) || 0) - (Number(x.requirement_weight) || 0));
+  if (scored.length > RADAR_MAX_AXES) {
+    const kept = scored.slice(0, RADAR_MAX_AXES);
+    const dropped = scored.slice(RADAR_MAX_AXES);
+    dropped.forEach((d) => unscored.push(d.competency));
+    return { axes: kept.map(normalizeRadarAxis), unscored };
+  }
+  return { axes: scored.map(normalizeRadarAxis), unscored };
+}
+
+// Full radar normalization. Returns null when there is no usable radar (fewer
+// than RADAR_MIN_AXES scored axes), so the renderer hides the section entirely
+// and the report still shows the skill bars.
+function normalizeRadar(raw, roleTitle) {
+  if (!raw || typeof raw !== "object") return null;
+  const { axes, unscored: derivedUnscored } = selectRadarAxes(raw.axes);
+  if (axes.length < RADAR_MIN_AXES) return null;
+  const declaredUnscored = Array.isArray(raw.unscored_competencies)
+    ? raw.unscored_competencies.map((c) => (typeof c === "string" ? c.trim() : "")).filter(Boolean)
+    : [];
+  const unscored = Array.from(new Set(declaredUnscored.concat(derivedUnscored))).filter(Boolean);
+  return {
+    role_title: typeof raw.role_title === "string" && raw.role_title.trim() ? raw.role_title.trim() : roleTitle,
+    benchmark_basis: typeof raw.benchmark_basis === "string" ? raw.benchmark_basis : "job_posting",
+    axes,
+    unscored_competencies: unscored,
+  };
+}
+
 // ---------- Normalize (lenient defaulting for optional/prose fields) ----------
 
 function normalizeReport(obj) {
@@ -930,6 +1070,7 @@ function normalizeJobReport(obj) {
   r.achievementSuggestions = Array.isArray(r.achievementSuggestions) ? r.achievementSuggestions : [];
   r.regretSuggestions = Array.isArray(r.regretSuggestions) ? r.regretSuggestions : [];
   r.skillDirections = Array.isArray(r.skillDirections) ? r.skillDirections : [];
+  r.radar = normalizeRadar(r.radar, r.jobTitle || "");
   r.summaryBullets = Array.isArray(r.summaryBullets) ? r.summaryBullets : [];
 
   r.jobTitle = r.jobTitle || "Untitled role";
@@ -1149,6 +1290,7 @@ function renderJobReport(report) {
     renderTopicChallenges(report), // BLD-999: challenges were missing from the render
     renderTopicRegrets(report),
     renderTopicSkills(report), // BLD-1004: matched roles/actions from strengths
+    renderRadarSection(report), // BLD-1025: competency radar (optional; falls back to bars)
     renderTopicGoals(report), // BLD-1002: suggestions + measurable parameters
   ].filter(Boolean);
 
@@ -1792,6 +1934,234 @@ function renderTopicSkills(report) {
   ];
   if (!report.skillsAnalysis && !directions.length) return null;
   return renderTopic(4, "Skills & growth", left, right, "Analysis & where you could go next");
+}
+
+// ---------- Competency radar (BLD-1025) ----------
+// A hand-rolled SVG spider/petal chart of the candidate's coverage across the
+// top competencies this role demands. Colours match the report system
+// (moss green candidate shape, dashed-neutral benchmark ring), so it is
+// color-blind-safe — the benchmark is told apart by style, not hue. Every
+// number carries its denominator: "4/5 · 80% of the role's expected level".
+
+const RADAR_W = 480;
+const RADAR_H = 430;
+const RADAR_CX = RADAR_W / 2;
+const RADAR_CY = RADAR_H / 2 - 6;
+const RADAR_R = 132;
+const RADAR_CANDIDATE = "#2D4A3E";
+const RADAR_BENCHMARK = "#978F80";
+const RADAR_TEXT = "#585249";
+const RADAR_RING = "#D8D4CC";
+const RADAR_AXIS = "#E9E7E1";
+
+// [x, y] for a point at `ratio` (0..1) of the radius on `angleDeg`.
+function radarPoint(angleDeg, ratio) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return [RADAR_CX + RADAR_R * ratio * Math.cos(rad), RADAR_CY + RADAR_R * ratio * Math.sin(rad)];
+}
+
+function radarPolygon(angles, getRatio) {
+  return angles
+    .map((deg) => radarPoint(deg, getRatio(deg)).map((v) => Number(v.toFixed(2))).join(","))
+    .join(" ");
+}
+
+// Pure geometry — returns the labelled axes so the renderer and tests can
+// agree on how many axes are on the figure.
+function radarAxes(radar) {
+  const n = radar.axes.length;
+  return radar.axes.map((axis, i) => ({ axis, angle: -90 + (360 / n) * i }));
+}
+
+function buildRadarSvg(radar) {
+  const entries = radarAxes(radar);
+  const angles = entries.map((e) => e.angle);
+  const n = angles.length;
+
+  // Concentric 1-5 rings + spokes.
+  const rings = [1, 2, 3, 4, 5].map((lvl) => {
+    const ratio = lvl / 5;
+    const outer = lvl === 5;
+    return h("polygon", {
+      points: radarPolygon(angles, () => ratio),
+      fill: "none",
+      stroke: outer ? "#B9B4A9" : RADAR_RING,
+      "stroke-width": outer ? "1.2" : "1",
+    });
+  });
+
+  const spokes = angles.map((deg) => {
+    const [x, y] = radarPoint(deg, 1);
+    return h("line", {
+      x1: RADAR_CX, y1: RADAR_CY, x2: Number(x.toFixed(2)), y2: Number(y.toFixed(2)),
+      stroke: RADAR_AXIS, "stroke-width": "1",
+    });
+  });
+
+  // 1-5 ticks along the top axis (deg = -90).
+  const ticks = [1, 2, 3, 4, 5].map((lvl) => {
+    const p = radarPoint(-90, lvl / 5);
+    return h("text", {
+      x: Number((p[0] + 6).toFixed(2)), y: Number((p[1] + 3).toFixed(2)),
+      "text-anchor": "start", "font-size": "10", fill: RADAR_TEXT, "font-family": "Inter, sans-serif",
+    }, String(lvl));
+  });
+
+  // Candidate polygon (moss, translucent fill) + vertices with tooltips.
+  const candPoints = radarPolygon(
+    angles,
+    (deg) => Math.max(0, Math.min(5, entries[angles.indexOf(deg)].axis.candidate_score)) / 5
+  );
+  // Benchmark polygon (dashed neutral — the reference ring).
+  const benchPoints = radarPolygon(
+    angles,
+    (deg) => Math.max(1, Math.min(5, entries[angles.indexOf(deg)].axis.role_benchmark)) / 5
+  );
+
+  const candidate = h("polygon", {
+    points: candPoints, fill: RADAR_CANDIDATE, "fill-opacity": "0.35",
+    stroke: RADAR_CANDIDATE, "stroke-width": "2", "stroke-linejoin": "round",
+  });
+  const benchmark = h("polygon", {
+    points: benchPoints, fill: "none",
+    stroke: RADAR_BENCHMARK, "stroke-width": "1.6", "stroke-dasharray": "5 4",
+    "stroke-linejoin": "round",
+  });
+
+  // Vertices: candidate dots (with native tooltip) + benchmark hollow squares.
+  const vertexNodes = [];
+  entries.forEach(({ axis, angle }) => {
+    const c = radarPoint(angle, Math.max(0, Math.min(5, axis.candidate_score)) / 5);
+    const b = radarPoint(angle, Math.max(1, Math.min(5, axis.role_benchmark)) / 5);
+    const tip = `${axis.competency} — ${axis.candidate_score}/5 · ${axis.coverage_pct}% of the role's expected level`;
+    const dot = h("circle", {
+      cx: Number(c[0].toFixed(2)), cy: Number(c[1].toFixed(2)), r: "3.5",
+      fill: RADAR_CANDIDATE, role: "img", "aria-label": tip,
+    });
+    dot.appendChild(h("title", {}, tip));
+    vertexNodes.push(dot);
+    vertexNodes.push(
+      h("rect", {
+        x: Number((b[0] - 3).toFixed(2)), y: Number((b[1] - 3).toFixed(2)),
+        width: "6", height: "6", fill: "none", stroke: RADAR_BENCHMARK, "stroke-width": "1.5",
+        role: "img", "aria-label": `Role benchmark for ${axis.competency}: ${axis.role_benchmark}/5`,
+      })
+    );
+  });
+
+  // Axis labels (competency names) outside the polygon vertices.
+  const labels = entries.map(({ axis, angle }) => {
+    const p = radarPoint(angle, 1.16);
+    const cos = Math.cos((angle * Math.PI) / 180);
+    const anchor = Math.abs(cos) < 0.25 ? "middle" : cos > 0 ? "start" : "end";
+    return h("text", {
+      x: Number(p[0].toFixed(2)), y: Number(p[1].toFixed(2)),
+      "text-anchor": anchor, "font-size": "12.5", fill: RADAR_TEXT,
+      "font-family": "Newsreader, Georgia, serif", "font-weight": "500",
+    }, axis.competency);
+  });
+
+  return h("svg", {
+    class: "report-card__radar-svg", viewBox: `0 0 ${RADAR_W} ${RADAR_H}`,
+    width: "100%", role: "img",
+    "aria-label": `Competency radar for ${radar.role_title}`, xmlns: "http://www.w3.org/2000/svg",
+  }, [...rings, ...spokes, ...ticks, benchmark, candidate, ...vertexNodes, ...labels]);
+}
+
+// Bars view — the same radar axes as horizontal bars, so the bars/radar
+// toggle always shows identical underlying data (BLD-1025 decision #3).
+function buildRadarBars(radar) {
+  const rows = radar.axes.map((axis) =>
+    h("div", { class: "report-card__radar-bar" }, [
+      h("div", { class: "report-card__radar-bar-head" }, [
+        h("span", {}, axis.competency),
+        h(
+          "span",
+          { class: "report-card__radar-bar-meta" },
+          `${axis.candidate_score}/5 · ${axis.coverage_pct}% of role's expected level`
+        ),
+      ]),
+      h("div", { class: "report-card__bar report-card__radar-bar-track" }, [
+        h("div", {
+          class: "report-card__bar-fill",
+          style: `width:${Math.max(0, Math.min(100, axis.coverage_pct))}%`,
+        }),
+      ]),
+    ])
+  );
+  return h("div", { class: "report-card__radar-bars" }, rows);
+}
+
+function radarLegend(radar) {
+  const items = [
+    h("span", { class: "report-card__radar-legend-item" }, [
+      h("span", { class: "report-card__radar-legend-swatch report-card__radar-legend-swatch--candidate" }),
+      "Your level",
+    ]),
+    h("span", { class: "report-card__radar-legend-item" }, [
+      h("span", { class: "report-card__radar-legend-swatch report-card__radar-legend-swatch--benchmark" }),
+      "Role's expected level",
+    ]),
+  ];
+  if (radar.unscored_competencies && radar.unscored_competencies.length) {
+    items.push(
+      h("span", { class: "report-card__radar-legend-item" }, [
+        h("span", { class: "report-card__radar-legend-swatch report-card__radar-legend-swatch--unscored" }),
+        `No evidence yet (${radar.unscored_competencies.join(", ")})`,
+      ])
+    );
+  }
+  return h("div", { class: "report-card__radar-legend" }, items);
+}
+
+function renderRadarSection(report) {
+  const radar = report.radar;
+  if (!radar) return null; // no role requirements parsed -> hide section (bars still show)
+  if (radar.axes.length < RADAR_MIN_AXES) return null; // <3 axes -> fall back to bars only
+
+  const title = radar.role_title || report.jobTitle;
+  const note =
+    radar.benchmark_basis === "job_posting"
+      ? "Axes are the competencies this role demands; scores are % of the role's expected level (your level ÷ the role's × 100)."
+      : `Scores are % of the role's expected level (your level ÷ the role's × 100). Basis: ${radar.benchmark_basis}.`;
+
+  // Default to the radar chart; the toggle also offers the same data as bars.
+  const svgWrap = h("div", { class: "report-card__radar-view report-card__radar-view--chart" }, [
+    buildRadarSvg(radar),
+  ]);
+  const barsWrap = h("div", { class: "report-card__radar-view report-card__radar-view--bars is-hidden" }, [
+    buildRadarBars(radar),
+  ]);
+
+  const toggle = h("div", { class: "report-card__radar-toggle", role: "group", "aria-label": "Choose radar or bar view" }, [
+    h("button", { class: "report-card__radar-toggle-btn is-active", type: "button", "data-view": "chart" }, "Radar"),
+    h("button", { class: "report-card__radar-toggle-btn", type: "button", "data-view": "bars" }, "Bars"),
+  ]);
+  const chartView = svgWrap;
+  const barsView = barsWrap;
+
+  toggle.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-view]");
+    if (!btn) return;
+    const view = btn.getAttribute("data-view");
+    toggle.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("is-active", b === btn));
+    chartView.classList.toggle("is-hidden", view !== "chart");
+    barsView.classList.toggle("is-hidden", view !== "bars");
+  });
+
+  return h("div", { class: "report-card__topic" }, [
+    h("div", { class: "report-card__topic-head" }, [
+      h("span", { class: "report-card__topic-index" }, "◈"),
+      h("h3", { class: "report-card__topic-title" }, `Competency radar — ${title}`),
+    ]),
+    h("div", { class: "report-card__radar" }, [
+      toggle,
+      chartView,
+      barsView,
+      h("p", { class: "report-card__note report-card__radar-note" }, note),
+      radarLegend(radar),
+    ]),
+  ]);
 }
 
 function renderTopicGoals(report) {

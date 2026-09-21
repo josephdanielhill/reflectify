@@ -16,6 +16,7 @@ import unittest
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 TEST_FILE = REPO_ROOT / "tests" / "test_parser.mjs"
+SMOKE_FILE = REPO_ROOT / "tests" / "smoke_radar_svg.mjs"
 
 
 class ParserRegressionSuite(unittest.TestCase):
@@ -31,6 +32,24 @@ class ParserRegressionSuite(unittest.TestCase):
             result.returncode,
             0,
             f"node --test failed (exit {result.returncode})\n"
+            f"--- stdout ---\n{result.stdout}\n--- stderr ---\n{result.stderr}",
+        )
+
+    def test_radar_svg_render_smoke_passes(self):
+        # BLD-1025 regression: the radar's shapes must be created in the SVG
+        # namespace, or the browser silently refuses to draw them (only dots +
+        # labels showed before the fix). Guards against SVG_TAGS drift.
+        self.assertTrue(SMOKE_FILE.is_file(), f"missing smoke test file: {SMOKE_FILE}")
+        result = subprocess.run(
+            ["node", str(SMOKE_FILE)],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            result.returncode,
+            0,
+            f"radar SVG smoke test failed (exit {result.returncode})\n"
             f"--- stdout ---\n{result.stdout}\n--- stderr ---\n{result.stderr}",
         )
 
