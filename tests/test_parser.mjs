@@ -17,7 +17,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parser } from "./parser-harness.mjs";
+import { parser, svgTags } from "./parser-harness.mjs";
 
 const {
   parseUploadedJson,
@@ -467,6 +467,25 @@ test("normalizeReport: radar present normalizes; absent radar -> null (backward 
   // legacy report with no radar still normalizes; radar is null
   const legacy = { jobTitle: "Dev", periodMonths: 6, overallScore: 8 };
   assert.equal(normalizeReport(legacy).radar, null);
+});
+
+test("BLD-1025 REGRESSION: every DOM element the radar emits is an SVG-namespace tag", () => {
+  // Every tag that `buildRadarSvg` (rings/spokes/benchmark/candidate/labels)
+  // and `buildRadarBars` pass to the DOM builder `h()` MUST be in SVG_TAGS.
+  // The DOM builder routes SVG tags through createElementNS; anything missing
+  // gets created as an HTML element and the browser silently refuses to draw
+  // it. Prior regression: the radar rendered only its circles+labels with the
+  // polygon/line shapes missing entirely (`polygon`, `line`, `title` were not
+  // in the set).
+  for (const tag of ["polygon", "line", "circle", "text", "title", "svg"]) {
+    assert.ok(
+      svgTags.has(tag),
+      `renderer tag "${tag}" must be SVG-aware so h() builds a drawable element`
+    );
+  }
+  // Sanity: the anchor tag is present. (No instanceof Set here — svgTags comes
+  // from the vm sandbox realm, so a cross-realm instanceof Set would be false.)
+  assert.ok(svgTags.has("svg"));
 });
 
 test("validateReport: malformed radar is rejected, not crashed on", () => {

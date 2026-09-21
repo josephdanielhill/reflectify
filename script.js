@@ -334,7 +334,12 @@ document.querySelectorAll("[data-nav]").forEach((el) => {
 // ---------- DOM builder ----------
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const SVG_TAGS = new Set(["svg", "g", "rect", "path", "text", "circle", "defs", "use", "clipPath", "linearGradient", "stop"]);
+// Note: polygon/line/title were UNKNOWN to the DOM stubs historically — if a
+// tag is missing from this set, `h()` creates an HTML element instead of an
+// SVG one, and the browser silently refuses to draw it. That caused the
+// BLD-1025 radar to render only dots+labels with no polygon shapes (the whole
+// chart). Keep every SVG element the renderers emit in this set.
+const SVG_TAGS = new Set(["svg", "g", "rect", "path", "text", "circle", "polygon", "line", "title", "defs", "use", "clipPath", "linearGradient", "stop"]);
 
 function h(tag, attrs = {}, children = []) {
   const el = SVG_TAGS.has(tag)
