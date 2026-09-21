@@ -17,7 +17,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parser } from "./parser-harness.mjs";
+import { parser, svgTags } from "./parser-harness.mjs";
 
 const {
   parseUploadedJson,
@@ -25,6 +25,10 @@ const {
   reportFramework,
   validateReport,
   normalizeReport,
+  radarCoveragePct,
+  selectRadarAxes,
+  normalizeRadar,
+  radarAxes,
 } = parser;
 
 // The parser runs inside a Node vm sandbox, so its arrays/objects carry a
@@ -341,4 +345,159 @@ test("chat-log fallback parser: placeholder for when it lands (BLD-1027)", () =>
   // below documents the current behaviour so the gap is explicit.
   const chatLog = "User: hello\nAssistant: hi";
   assert.throws(() => parseUploadedJson(chatLog), "raw chat log has no JSON today");
+});
+
+// ---------------------------------------------------------------------------
+// 5. Competency radar (BLD-1025)
+// ---------------------------------------------------------------------------
+
+test("radarCoveragePct: candidate ÷ benchmark × 100, never a bare number", () => {
+  assert.equal(radarCoveragePct(4, 5), 80);
+  assert.equal(radarCoveragePct(5, 5), 100);
+  assert.equal(radarCoveragePct(2, 4), 50);
+  // candidate can exceed the benchmark (coverage > 100%) and is meaningful
+  assert.equal(radarCoveragePct(5, 4), 125);
+  // guards: bad benchmark -> 0, non-numeric candidate -> 0
+  assert.equal(radarCoveragePct(3, 0), 0);
+  assert.equal(radarCoveragePct("n/a", 5), 0);
+});
+
+const SIX_AXES = [
+  { competency: "React", requirement_weight: 1.0, candidate_score: 4, role_benchmark: 5 },
+  { competency: "TypeScript", requirement_weight: 0.9, candidate_score: 4, role_benchmark: 4 },
+  { competency: "Testing", requirement_weight: 0.8, candidate_score: 3, role_benchmark: 4 },
+  { competency: "Web performance", requirement_weight: 0.7, candidate_score: 4, role_benchmark: 5 },
+  { competency: "Design systems", requirement_weight: 0.6, candidate_score: 3, role_benchmark: 3 },
+  { competency: "Accessibility", requirement_weight: 0.7, candidate_score: 0, role_benchmark: 5 },
+];
+
+test("selectRadarAxes: keeps only scored axes; no-evidence goes to unscored", () => {
+  const { axes, unscored } = selectRadarAxes(SIX_AXES);
+  // Accessibility has candidate_score 0 -> unscored, not an axis
+  assert.equal(axes.length, 5);
+  assert.ok(unscored.includes("Accessibility"));
+  // coverage_pct computed on every axis
+  const react = axes.find((a) => a.competency === "React");
+  assert.equal(react.coverage_pct, 80);
+  const ts = axes.find((a) => a.competency === "TypeScript");
+  assert.equal(ts.coverage_pct, 100);
+});
+
+test("selectRadarAxes: caps at 8 by requirement_weight, surplus goes to unscored", () => {
+  const many = [];
+  for (let i = 0; i < 12; i++) {
+    many.push({
+      competency: `C${i}`,
+      requirement_weight: 1 - i / 20, // descending importance
+      candidate_score: 4,
+      role_benchmark: 5,
+    });
+  }
+  const { axes, unscored } = selectRadarAxes(many);
+  assert.equal(axes.length, 8); // hard cap
+  assert.equal(axes[0].competency, "C0"); // highest weight first
+  assert.ok(unscored.length >= 4);
+  assert.ok(!unscored.includes("C0"));
+  // all 12 competencies accounted for across axes + unscored
+  const accounted = new Set(axes.map((a) => a.competency).concat(unscored));
+  assert.equal(accounted.size, 12);
+});
+
+test("selectRadarAxes: guards against malformed / missing axes", () => {
+  jsonEqual(selectRadarAxes(undefined), { axes: [], unscored: [] });
+  jsonEqual(selectRadarAxes("nope"), { axes: [], unscored: [] });
+  const { axes, unscored } = selectRadarAxes([
+    { competency: "", candidate_score: 4, role_benchmark: 5 }, // blank name -> dropped
+    null,
+    { competency: "NoBench", candidate_score: 4 }, // no benchmark -> no evidence
+    { competency: "Ok", candidate_score: 4, role_benchmark: 3 },
+  ]);
+  assert.equal(axes.length, 1);
+  assert.equal(axes[0].competency, "Ok");
+  assert.ok(unscored.includes("NoBench"));
+});
+
+test("normalizeRadar: returns null for <3 axes (falls back to bars)", () => {
+  const twoAxes = {
+    role_title: "Role",
+    axes: [
+      { competency: "A", candidate_score: 4, role_benchmark: 5 },
+      { competency: "B", candidate_score: 3, role_benchmark: 4 },
+    ],
+  };
+  assert.equal(normalizeRadar(twoAxes, "Role"), null);
+  assert.equal(normalizeRadar(null, "Role"), null);
+  assert.equal(normalizeRadar({}, "Role"), null);
+});
+
+test("normalizeRadar: unscored merged + deduped, role_title defaulted", () => {
+  const radar = normalizeRadar(
+    { axes: SIX_AXES, unscored_competencies: ["Design engineering"] },
+    "Senior Frontend Engineer"
+  );
+  assert.ok(radar);
+  assert.equal(radar.role_title, "Senior Frontend Engineer"); // defaulted
+  assert.equal(radar.benchmark_basis, "job_posting"); // defaulted
+  assert.equal(radar.axes.length, 5);
+  // Accessibility (unscored by axis scoring) + declared unscored merged
+  assert.ok(radar.unscored_competencies.includes("Accessibility"));
+  assert.ok(radar.unscored_competencies.includes("Design engineering"));
+});
+
+test("radarAxes: one angle per axis, evenly spaced starting at top (-90°)", () => {
+  const radar = normalizeRadar({ axes: SIX_AXES }, "R");
+  const entries = radarAxes(radar);
+  assert.equal(entries.length, 5);
+  assert.equal(entries[0].angle, -90);
+  const step = 360 / 5;
+  entries.forEach((e, i) => assert.equal(e.angle, -90 + i * step));
+});
+
+test("normalizeReport: radar present normalizes; absent radar -> null (backward compat)", () => {
+  const withRadar = {
+    jobTitle: "Senior Frontend Engineer",
+    periodMonths: 6,
+    overallScore: 8,
+    radar: { axes: SIX_AXES },
+  };
+  const norm = normalizeReport(withRadar);
+  assert.ok(norm.radar);
+  assert.equal(norm.radar.axes.length, 5);
+
+  // legacy report with no radar still normalizes; radar is null
+  const legacy = { jobTitle: "Dev", periodMonths: 6, overallScore: 8 };
+  assert.equal(normalizeReport(legacy).radar, null);
+});
+
+test("BLD-1025 REGRESSION: every DOM element the radar emits is an SVG-namespace tag", () => {
+  // Every tag that `buildRadarSvg` (rings/spokes/benchmark/candidate/labels)
+  // and `buildRadarBars` pass to the DOM builder `h()` MUST be in SVG_TAGS.
+  // The DOM builder routes SVG tags through createElementNS; anything missing
+  // gets created as an HTML element and the browser silently refuses to draw
+  // it. Prior regression: the radar rendered only its circles+labels with the
+  // polygon/line shapes missing entirely (`polygon`, `line`, `title` were not
+  // in the set).
+  for (const tag of ["polygon", "line", "circle", "text", "title", "svg"]) {
+    assert.ok(
+      svgTags.has(tag),
+      `renderer tag "${tag}" must be SVG-aware so h() builds a drawable element`
+    );
+  }
+  // Sanity: the anchor tag is present. (No instanceof Set here — svgTags comes
+  // from the vm sandbox realm, so a cross-realm instanceof Set would be false.)
+  assert.ok(svgTags.has("svg"));
+});
+
+test("validateReport: malformed radar is rejected, not crashed on", () => {
+  assert.equal(
+    validateReport({ jobTitle: "x", periodMonths: 1, overallScore: 1, radar: "nope" }).valid,
+    false
+  );
+  assert.equal(
+    validateReport({
+      jobTitle: "x", periodMonths: 1, overallScore: 1,
+      radar: { axes: [{ competency: "", candidate_score: 9 }] },
+    }).valid,
+    false
+  );
 });

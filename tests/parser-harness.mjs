@@ -131,6 +131,10 @@ export const parser = {
   normalizeReport: sandbox.normalizeReport,
   normalizeJobReport: sandbox.normalizeJobReport,
   normalizePersonalDevReport: sandbox.normalizePersonalDevReport,
+  radarCoveragePct: sandbox.radarCoveragePct,
+  selectRadarAxes: sandbox.selectRadarAxes,
+  normalizeRadar: sandbox.normalizeRadar,
+  radarAxes: sandbox.radarAxes,
 };
 
 // Guard: if any function is missing, the harness is broken — fail loudly.
@@ -139,3 +143,10 @@ for (const [name, fn] of Object.entries(parser)) {
     throw new Error(`parser-harness: script.js did not expose "${name}" — is the parser still in script.js?`);
   }
 }
+
+// The SVG-namespace tag set the DOM builder routes through createElementNS.
+// Exposed for the BLD-1025 regression test: if a renderer's tag is missing
+// from this set, `h()` builds an HTML element and the browser won't draw it.
+// SVG_TAGS is a top-level `const`, which in a vm sandbox is a lexical binding
+// (not a global property), so read it back via runInContext.
+export const svgTags = vm.runInContext("SVG_TAGS", sandbox);
