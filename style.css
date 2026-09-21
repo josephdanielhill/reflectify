@@ -582,10 +582,26 @@ textarea.input {
 
 .tool-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  /* BLD-1049: default to a single column; the .tool-grid--N count modifiers set
+     equal 1fr columns so the active tool cards fill the full container width
+     instead of leaving narrow auto-fit gaps. */
+  grid-template-columns: 1fr;
   gap: var(--space-4);
   width: 100%;
   margin-top: var(--space-2);
+}
+.tool-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tool-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tool-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .tool-grid--3,
+  .tool-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .tool-grid--2,
+  .tool-grid--3,
+  .tool-grid--4 { grid-template-columns: 1fr; }
 }
 .tool-card {
   display: flex;
@@ -708,6 +724,10 @@ textarea.input {
   -webkit-tap-highlight-color: transparent;
 }
 .tool-card--placeholder {
+  /* BLD-1049: keep "More tools coming soon" on its own dedicated full-width
+     row so the active tool cards share the row(s) above together. */
+  grid-column: 1 / -1;
+  width: 100%;
   padding: 0 0 var(--space-4);
   cursor: default;
   opacity: 0.8;

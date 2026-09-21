@@ -327,6 +327,9 @@ function h(tag, attrs = {}, children = []) {
 
 function initToolGrid() {
   const grid = document.getElementById("tool-grid");
+  // BLD-1049: tag the grid with the active-tool count so CSS can lay the cards
+  // out in equal columns that fill the container width (no narrow auto-fit gaps).
+  grid.classList.add("tool-grid--" + TOOLS.length);
 
   TOOLS.forEach((tool) => {
     const cardMedia = tool.image
