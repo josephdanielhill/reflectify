@@ -131,6 +131,10 @@ export const parser = {
   normalizeReport: sandbox.normalizeReport,
   normalizeJobReport: sandbox.normalizeJobReport,
   normalizePersonalDevReport: sandbox.normalizePersonalDevReport,
+  radarCoveragePct: sandbox.radarCoveragePct,
+  selectRadarAxes: sandbox.selectRadarAxes,
+  normalizeRadar: sandbox.normalizeRadar,
+  radarAxes: sandbox.radarAxes,
 };
 
 // Guard: if any function is missing, the harness is broken — fail loudly.
