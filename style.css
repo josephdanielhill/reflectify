@@ -1500,6 +1500,21 @@ textarea.input {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+  /* The PDF should contain the report card and nothing else. With only
+     `visibility: hidden` (which keeps layout size), the header, footer,
+     toolbar, feedback FAB and inactive views stay in the document flow and
+     end up as phantom (mostly empty) pages after the report. Pull them out
+     of flow with display:none so pagination only spans the report itself. */
+  .header-container,
+  .site-footer,
+  .report-toolbar,
+  .beta-feedback,
+  #tool-hero,
+  #view-home,
+  #view-prompt,
+  #view-upload {
+    display: none !important;
+  }
   body * {
     visibility: hidden;
   }
@@ -1522,7 +1537,6 @@ textarea.input {
   .report-card__header,
   .report-card__sentiment,
   .report-card__summary,
-  .report-card__col,
   .report-card__quotes,
   .report-card__conclusion,
   .report-card__footer,
@@ -1531,6 +1545,44 @@ textarea.input {
   .report-card__timeline-item,
   .report-card__quote {
     break-inside: avoid;
+  }
+  /* A topic is a heading + full-width two-column grid. If the whole grid were
+     kept together, a grid taller than the remaining page space would jump to
+     the next page and strand the section heading alone above a blank page (the
+     "heading + empty page" bug). Allowing the columns to split — while the
+     individual items above stay atomic — keeps content flowing across pages so
+     the heading is never abandoned. */
+  .report-card__grid,
+  .report-card__col {
+    break-inside: auto;
+  }
+
+  /* Keep headings with the content that follows them so a section title is
+     never stranded alone at the bottom of a page (the "heading + empty page"
+     artifact). */
+  .report-card h1,
+  .report-card h3,
+  .report-card h4,
+  .report-card h5,
+  .report-card h6,
+  .report-card__topic-head,
+  .report-card__skill-head,
+  .report-card__label,
+  .report-card__insight-label,
+  .report-card__radar-toggle {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Avoid a single orphaned line of body copy at a page break. */
+  .report-card p,
+  .report-card li,
+  .report-card__item-detail,
+  .report-card__sentiment-note,
+  .report-card__headline,
+  .report-card__summary-text {
+    orphans: 3;
+    widows: 3;
   }
 }
 
