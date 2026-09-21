@@ -482,3 +482,124 @@ test("validateReport: malformed radar is rejected, not crashed on", () => {
     false
   );
 });
+
+// ---------------------------------------------------------------------------
+// 6. Weekly Reset framework (BLD-1042)
+// ---------------------------------------------------------------------------
+
+const WEEKLY_REPORT = {
+  weekLabel: "Week of 14 Sep",
+  headline: "A week of steady momentum.",
+  atAGlance: ["Shipped the migration", "Protected an evening off"],
+  wins: [
+    { title: "Shipped the migration", detail: "Finished the data migration.", quote: "It just took a morning." },
+  ],
+  drains: [{ title: "Meeting sprawl", detail: "Three back-to-back meetings on Wednesday." }],
+  intentionReview: {
+    lastIntention: "Start the migration before Friday",
+    status: "kept",
+    insight: "You kept it because the first step was tiny.",
+  },
+  gratitude: ["A long walk on Tuesday"],
+  letGo: ["The guilt about the migration"],
+  nextFocus: {
+    intention: "Protect two deep-work mornings",
+    why: "The migration win showed the value of a focused morning.",
+    firstStep: "Block Tuesday and Thursday 9-11am.",
+    measure: "Two mornings without email before noon.",
+  },
+  energy: { score: 6.5, note: "Drained by meetings, refilled by the walk." },
+  quotes: [{ section: "wins", text: "It just took a morning." }],
+  sentiment: { label: "Steady", score: 42, note: "A grounded week ending on a high." },
+  conclusion: "A week that proved the value of a small first step.",
+};
+
+test("weekly report: exact schema validates and normalizes without error", () => {
+  const { valid, errors } = validateReport(WEEKLY_REPORT);
+  assert.equal(valid, true, `expected valid, got errors: ${errors.join("; ")}`);
+  const norm = normalizeReport(WEEKLY_REPORT);
+  assert.equal(norm.weekLabel, "Week of 14 Sep");
+  assert.equal(norm.nextFocus.intention, "Protect two deep-work mornings");
+  assert.equal(norm.energy.score, 6.5);
+  assert.equal(norm.energy.pct, "65%"); // 6.5 * 10
+  assert.equal(norm.sentiment.pct, "71%"); // (42 + 100) / 2
+});
+
+test("framework detection: weekly vs job vs personal-dev do not cross-detect", () => {
+  assert.equal(reportFramework(WEEKLY_REPORT), "weekly-reset");
+  assert.equal(reportFramework(JOB_REPORT), "job-reflection");
+  assert.equal(reportFramework(DEV_REPORT), "personal-development");
+  // A job report must NOT be detected as weekly, and vice versa.
+  assert.equal(reportFramework({ ...JOB_REPORT, weekLabel: "Week of 1 Sep" }), "weekly-reset");
+  assert.equal(reportFramework({ ...WEEKLY_REPORT, jobTitle: "Designer" }), "weekly-reset");
+  // A weekly report that happens to carry a dev-only key is still weekly
+  // (weekly detection runs first).
+  assert.equal(reportFramework({ ...WEEKLY_REPORT, season: "x" }), "weekly-reset");
+});
+
+test("weekly report: German prose with English keys validates and normalizes", () => {
+  const de = {
+    weekLabel: "Woche vom 14. Sep",
+    headline: "Eine Woche mit stetigem Schwung.",
+    atAGlance: ["Die Migration abgeschlossen"],
+    wins: [{ title: "Migration", detail: "Die Datenmigration abgeschlossen." }],
+    nextFocus: { intention: "Zwei Deep-Work-Vormittage schützen" },
+    energy: { score: 6.5, note: "Durch Meetings entleert." },
+    conclusion: "Eine Woche, die den Wert eines kleinen ersten Schritts zeigte.",
+  };
+  const { valid, errors } = validateReport(de);
+  assert.equal(valid, true, `German weekly report should validate: ${errors.join("; ")}`);
+  const norm = normalizeReport(de);
+  assert.equal(norm.weekLabel, "Woche vom 14. Sep");
+  assert.equal(norm.nextFocus.intention, "Zwei Deep-Work-Vormittage schützen");
+  assert.equal(norm.energy.score, 6.5);
+});
+
+test("weekly report: load-bearing fields are strict", () => {
+  // missing weekLabel
+  assert.equal(validateReport({ ...WEEKLY_REPORT, weekLabel: "" }).valid, false);
+  // missing nextFocus.intention
+  assert.equal(
+    validateReport({ ...WEEKLY_REPORT, nextFocus: { intention: "" } }).valid,
+    false
+  );
+  // bad energy.score (out of 0-10)
+  assert.equal(
+    validateReport({ ...WEEKLY_REPORT, energy: { score: 11 } }).valid,
+    false
+  );
+  // non-object nextFocus
+  assert.equal(validateReport({ ...WEEKLY_REPORT, nextFocus: "nope" }).valid, false);
+});
+
+test("weekly report: optional fields are lenient (first-week skip)", () => {
+  const minimal = {
+    weekLabel: "Week of 1 Sep",
+    nextFocus: { intention: "Rest more" },
+    energy: { score: 5 },
+  };
+  const { valid, errors } = validateReport(minimal);
+  assert.equal(valid, true, `minimal weekly should validate: ${errors.join("; ")}`);
+  const norm = normalizeReport(minimal);
+  jsonEqual(norm.wins, []);
+  jsonEqual(norm.drains, []);
+  jsonEqual(norm.gratitude, []);
+  jsonEqual(norm.letGo, []);
+  assert.equal(norm.intentionReview, null);
+  assert.equal(norm.energy.score, 5);
+  assert.ok(typeof norm.conclusion === "string" && norm.conclusion.length > 0);
+});
+
+test("normalizeWeeklyResetReport: weird input never throws", () => {
+  const weird = {
+    weekLabel: "Week of 1 Sep",
+    nextFocus: { intention: "x", why: 5 },
+    energy: { score: "high" },
+    quotes: [42, null, { text: "ok" }],
+    sentiment: { score: 999 },
+  };
+  const norm = normalizeReport(weird); // must not throw
+  assert.equal(norm.energy, null); // score not a number -> dropped
+  assert.equal(norm.quotes.length, 1); // {text:"ok"}
+  assert.equal(norm.sentiment.score, 100); // clamped
+});

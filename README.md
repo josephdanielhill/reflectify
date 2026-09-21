@@ -56,6 +56,37 @@ Only `jobTitle`, `periodMonths`, and `overallScore` are required — everything
 else defaults gracefully (missing arrays render as empty sections, missing
 `sentiment`/`wellbeing`/`quotes` sections simply don't appear).
 
+## Weekly Reset (Framework #3)
+
+A third framework, **Weekly Reset**, ships alongside Job and Personal
+Reflection. It's a short, mindful end-of-week check-in (the "Sunday Reset"):
+wins, drains, last week's intention, what to let go, and one focus for the
+week ahead. Its report schema is keyed on `weekLabel` / `nextFocus` and is
+detected and rendered separately from the Job and Personal frameworks, so
+uploading a weekly JSON never collides with the other two.
+
+```ts
+interface WeeklyResetReport {
+  weekLabel: string;                 // e.g. "Week of 14 Sep"
+  headline: string;
+  atAGlance: string[];
+  wins: { title: string; detail: string; quote?: string }[];
+  drains: { title: string; detail: string }[];
+  intentionReview?: { lastIntention: string; status: "kept"|"partial"|"dropped"|"none"; insight: string };
+  gratitude?: string[];
+  letGo?: string[];
+  nextFocus: { intention: string; why: string; firstStep: string; measure: string };
+  energy: { score: number; note: string };   // score 0-10
+  quotes?: { section: string; text: string }[];
+  sentiment?: { label: string; score: number; note: string };
+  conclusion: string;
+}
+```
+
+Only `weekLabel`, `nextFocus.intention`, and `energy.score` are required;
+everything else defaults gracefully (first-week reports that skip the
+intention review still render).
+
 ## Running it
 
 There's no build step. Either:
