@@ -2111,6 +2111,10 @@ textarea.input {
 .report-card__bar--energy {
   flex: 1;
 }
+.report-card__energy-score--sentiment {
+  font-size: 22px;
+  line-height: 1.1;
+}
 .report-card__energy-note {
   margin: 10px 0 0;
   font-size: 13px;

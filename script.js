@@ -1532,19 +1532,16 @@ function renderJobReport(report) {
           : null;
 
         const sentiment = report.sentiment
-          ? h("div", { class: "report-card__sentiment-main" }, [
-              h("div", { class: "report-card__sentiment-meta" }, [
-                h("h6", { class: "report-card__label" }, "Sentiment"),
-                h("div", { class: "report-card__sentiment-value" }, report.sentiment.label),
-              ]),
-              h("div", { class: "report-card__sentiment-meter" }, [
-                h("div", { class: "report-card__bar report-card__bar--sentiment" }, [
+          ? h("div", { class: "report-card__energy" }, [
+              h("h6", { class: "report-card__label" }, "Sentiment"),
+              h("div", { class: "report-card__energy-main" }, [
+                h("div", { class: "report-card__energy-score report-card__energy-score--sentiment" }, report.sentiment.label),
+                h("div", { class: "report-card__bar report-card__bar--energy" }, [
                   h("div", { class: "report-card__bar-fill", style: `width:${report.sentiment.pct}` }),
                 ]),
-                h("span", { class: "report-card__sentiment-score" }, String(report.sentiment.score)),
               ]),
               report.sentiment.note
-                ? h("p", { class: "report-card__sentiment-note" }, report.sentiment.note)
+                ? h("p", { class: "report-card__energy-note" }, report.sentiment.note)
                 : null,
             ])
           : null;
