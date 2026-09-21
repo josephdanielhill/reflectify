@@ -126,15 +126,15 @@ export const parser = {
   extractFirstJsonObject: sandbox.extractFirstJsonObject,
   reportFramework: sandbox.reportFramework,
   validateReport: sandbox.validateReport,
-    validateJobReport: sandbox.validateJobReport,
-    validatePersonalDevReport: sandbox.validatePersonalDevReport,
-    validateWeeklyResetReport: sandbox.validateWeeklyResetReport,
-    normalizeReport: sandbox.normalizeReport,
-    normalizeJobReport: sandbox.normalizeJobReport,
-    normalizePersonalDevReport: sandbox.normalizePersonalDevReport,
-    normalizeWeeklyResetReport: sandbox.normalizeWeeklyResetReport,
-        renderWeeklyResetReport: sandbox.renderWeeklyResetReport,
-      };
+  validateJobReport: sandbox.validateJobReport,
+  validatePersonalDevReport: sandbox.validatePersonalDevReport,
+  validateWeeklyResetReport: sandbox.validateWeeklyResetReport,
+  normalizeReport: sandbox.normalizeReport,
+  normalizeJobReport: sandbox.normalizeJobReport,
+  normalizePersonalDevReport: sandbox.normalizePersonalDevReport,
+  normalizeWeeklyResetReport: sandbox.normalizeWeeklyResetReport,
+  renderWeeklyResetReport: sandbox.renderWeeklyResetReport,
+};
 
 // Guard: if any function is missing, the harness is broken — fail loudly.
 for (const [name, fn] of Object.entries(parser)) {

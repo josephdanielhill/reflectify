@@ -477,3 +477,4 @@ test("chat-log fallback parser: placeholder for when it lands (BLD-1027)", () =>
     assert.notEqual(reportFramework(WEEKLY_REPORT), "job-reflection");
     assert.notEqual(reportFramework(WEEKLY_REPORT), "personal-development");
   });
+
