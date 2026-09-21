@@ -708,6 +708,10 @@ textarea.input {
   -webkit-tap-highlight-color: transparent;
 }
 .tool-card--placeholder {
+  /* BLD-1049: move "More tools coming soon" onto its own dedicated row so
+     the three active tool tiles render together in the row above. */
+  grid-column: 1 / -1;
+  width: 100%;
   padding: 0 0 var(--space-4);
   cursor: default;
   opacity: 0.8;
