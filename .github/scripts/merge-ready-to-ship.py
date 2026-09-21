@@ -165,44 +165,53 @@ def find_ticket_pr(repo, ident):
 
 
 def feature_in_main(repo, ident):
-    """True iff the ticket's feature code is actually in main (or staging).
+    """True iff the ticket's feature code is actually in main.
 
     Guards against the silent-failure where a staging->main promo PR merges but
     the ticket's feature branch was never merged into staging, so the promo
-    ships unrelated work and the ticket is wrongly marked Done. Finds the
-    ticket's OWN feature PR (open or merged) by identifier and checks whether
-    its head branch is fully contained in the current main. Promo PRs
-    (staging->main, title prefixed 'Promote') are EXCLUDED: their head is the
-    `staging` integration branch, trivially in main after any promo merge.
+    ships unrelated work and the ticket is wrongly marked Done.
+
+    Robust rule (handles squash merges and deleted feature branches):
+      The feature is in main iff a feature PR for this ticket merged into
+      staging AND a staging->main promo PR merged AFTER that feature merge.
+      (A feature->main PR merged directly also counts.)
     """
     idl = ident.lower()
     out, rc, _ = gh(["pr", "list", "--repo", f"{GITHUB_ORG}/{repo}",
                      "--state", "all", "--limit", "100",
-                     "--json", "number,title,headRefName,state,mergedAt"])
+                     "--json", "number,title,headRefName,baseRefName,state,mergedAt"])
     if rc != 0 or not out:
         return False
     try:
         prs = json.loads(out)
     except Exception:
         return False
+
+    latest_promo = None
     for pr in prs:
         title = pr.get("title", "") or ""
         head = pr.get("headRefName") or ""
+        if title.strip().lower().startswith("promote") or head == "staging":
+            if pr.get("state") == "MERGED" and pr.get("mergedAt"):
+                ts = pr.get("mergedAt")
+                if latest_promo is None or ts > latest_promo:
+                    latest_promo = ts
+
+    for pr in prs:
+        title = pr.get("title", "") or ""
+        head = pr.get("headRefName") or ""
+        base = pr.get("baseRefName") or ""
         if title.strip().lower().startswith("promote") or head == "staging":
             continue
         hay = (f"{title} {head}").lower()
         if idl not in hay:
             continue
-        cmp, crc, _ = gh(["api", f"repos/{GITHUB_ORG}/{repo}/compare/main...{head}",
-                          "--jq", "{ahead_by,behind_by,status}"])
-        if crc == 0 and cmp:
-            try:
-                c = json.loads(cmp)
-                if c.get("behind_by") == 0 and c.get("ahead_by") == 0:
-                    return True
-            except Exception:
-                pass
-        if pr.get("state") == "MERGED" and pr.get("mergedAt"):
+        if pr.get("state") != "MERGED" or not pr.get("mergedAt"):
+            continue
+        feat_ts = pr.get("mergedAt")
+        if base == "main":
+            return True
+        if latest_promo and feat_ts < latest_promo:
             return True
     return False
 
