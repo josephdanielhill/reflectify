@@ -25,6 +25,8 @@ const {
   reportFramework,
   validateReport,
   normalizeReport,
+  validateWeeklyResetReport,
+  normalizeWeeklyResetReport,
   radarCoveragePct,
   selectRadarAxes,
   normalizeRadar,
@@ -344,6 +346,142 @@ test("chat-log fallback parser: placeholder for when it lands (BLD-1027)", () =>
   // parsed into a valid report instead of erroring. Until then, the assertion
   // below documents the current behaviour so the gap is explicit.
   const chatLog = "User: hello\nAssistant: hi";
+
+    assert.throws(() => parseUploadedJson(chatLog), "raw chat log has no JSON today");
+  });
+
+  // ---------------------------------------------------------------------------
+  // 5. Weekly Reset framework (BLD-1042) — happy path + mis-detection guards
+  // ---------------------------------------------------------------------------
+
+  // A fully-populated, exact-schema Weekly Reset report.
+  const WEEKLY_REPORT = {
+    weekLabel: "Week of 14 Sep",
+    headline: "A full week of shipping and a much-needed Sunday off.",
+    atAGlance: ["Shipped the parser", "Slept properly", "Said no to one extra project"],
+    wins: [
+      { title: "Shipped the parser", detail: "Got the JSON parser merged.", quote: "I finally shipped it." },
+      { title: "Took a real Sunday off", detail: "No laptop, just a long walk." },
+    ],
+    drains: [{ title: "Late nights", detail: "Three nights past midnight." }],
+    intentionReview: {
+      lastIntention: "Ship the parser",
+      status: "kept",
+      insight: "It landed because I blocked the whole week for it.",
+    },
+    gratitude: ["The walk on Sunday", "A good call with a friend"],
+    letGo: ["The guilt about the unread inbox"],
+    nextFocus: {
+      intention: "Protect the Sunday reset",
+      why: "It refilled me more than any late night did",
+      firstStep: "Book the walk before the week starts",
+      measure: "One full Sunday with no laptop",
+    },
+    energy: { score: 7.5, note: "Drained by late nights, refilled by the Sunday off." },
+    quotes: [
+      { section: "wins", text: "I finally shipped it." },
+      { section: "nextFocus", text: "The walk refilled me." },
+    ],
+    sentiment: { label: "Mostly good", score: 55, note: "Proud of the ship, tired from the nights." },
+    conclusion: "A week that shipped something real and reminded me the reset matters.",
+  };
+
+  test("weekly report: exact schema validates and normalizes without error", () => {
+    const { valid, errors } = validateReport(WEEKLY_REPORT);
+    assert.equal(valid, true, `expected valid, got errors: ${errors.join("; ")}`);
+    const norm = normalizeReport(WEEKLY_REPORT);
+    assert.equal(norm.weekLabel, "Week of 14 Sep");
+    assert.equal(norm.nextFocus.intention, "Protect the Sunday reset");
+    assert.equal(norm.energy.score, 7.5);
+    assert.equal(norm.energy.pct, "75%");
+  });
+
+  test("weekly report: reportFramework detects weekly-reset, not job/dev", () => {
+    assert.equal(reportFramework(WEEKLY_REPORT), "weekly-reset");
+  });
+
+  test("weekly report: minimal schema (weekLabel + nextFocus) validates", () => {
+    const minimal = {
+      weekLabel: "Week of 21 Sep",
+      headline: "A quiet week.",
+      nextFocus: { intention: "Rest more" },
+      energy: { score: 6 },
+    };
+    const { valid, errors } = validateReport(minimal);
+    assert.equal(valid, true, `expected valid, got errors: ${errors.join("; ")}`);
+  });
+
+  test("weekly report: missing nextFocus.intention is invalid", () => {
+    const bad = {
+      weekLabel: "Week of 21 Sep",
+      headline: "A week.",
+      nextFocus: { why: "no intention" },
+      energy: { score: 6 },
+    };
+    const { valid, errors } = validateReport(bad);
+    assert.equal(valid, false);
+    assert.ok(errors.some((e) => e.includes("nextFocus.intention")));
+  });
+
+  test("weekly report: energy.score out of range is invalid", () => {
+    const bad = {
+      weekLabel: "Week of 21 Sep",
+      headline: "A week.",
+      nextFocus: { intention: "Rest" },
+      energy: { score: 11 },
+    };
+    const { valid, errors } = validateReport(bad);
+    assert.equal(valid, false);
+    assert.ok(errors.some((e) => e.includes("energy.score")));
+  });
+
+  test("weekly report: lenient on missing optional fields (first week)", () => {
+    const firstWeek = {
+      weekLabel: "Week of 28 Sep",
+      headline: "First week.",
+      nextFocus: { intention: "Build the habit" },
+      energy: { score: 5 },
+    };
+    const { valid, errors } = validateReport(firstWeek);
+    assert.equal(valid, true, `expected valid, got errors: ${errors.join("; ")}`);
+    const norm = normalizeReport(firstWeek);
+    assert.equal(norm.intentionReview, null);
+    assert.equal(norm.quotes.length, 0);
+    assert.ok(norm.conclusion.includes("build the habit"));
+  });
+
+  test("weekly report: German prose with English keys validates and normalizes", () => {
+    const de = {
+      weekLabel: "Woche vom 14. Sep",
+      headline: "Eine volle Woche voller Fortschritt.",
+      nextFocus: { intention: "Den Sonntag schützen" },
+      energy: { score: 7 },
+      conclusion: "Eine Woche, die etwas Echtes geliefert hat.",
+    };
+    const { valid, errors } = validateReport(de);
+    assert.equal(valid, true, `German weekly report should validate: ${errors.join("; ")}`);
+    const norm = normalizeReport(de);
+    assert.equal(norm.weekLabel, "Woche vom 14. Sep");
+    assert.equal(norm.nextFocus.intention, "Den Sonntag schützen");
+  });
+
+  // Mis-detection guards: job/dev JSON must NOT be detected as weekly, and
+  // weekly JSON must NOT be detected as job/dev.
+  test("mis-detection: job report is not detected as weekly-reset", () => {
+    assert.equal(reportFramework(JOB_REPORT), "job-reflection");
+    assert.notEqual(reportFramework(JOB_REPORT), "weekly-reset");
+  });
+
+  test("mis-detection: personal-dev report is not detected as weekly-reset", () => {
+    assert.equal(reportFramework(DEV_REPORT), "personal-development");
+    assert.notEqual(reportFramework(DEV_REPORT), "weekly-reset");
+  });
+
+  test("mis-detection: weekly report is not detected as job or personal-dev", () => {
+    assert.equal(reportFramework(WEEKLY_REPORT), "weekly-reset");
+    assert.notEqual(reportFramework(WEEKLY_REPORT), "job-reflection");
+    assert.notEqual(reportFramework(WEEKLY_REPORT), "personal-development");
+  });
   assert.throws(() => parseUploadedJson(chatLog), "raw chat log has no JSON today");
 });
 
@@ -501,3 +639,4 @@ test("validateReport: malformed radar is rejected, not crashed on", () => {
     false
   );
 });
+>>>>>>> origin/main
