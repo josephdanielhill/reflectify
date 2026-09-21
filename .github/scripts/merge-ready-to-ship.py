@@ -162,6 +162,51 @@ def find_ticket_pr(repo, ident):
     return None
 
 
+
+
+def feature_in_main(repo, ident):
+    """True iff the ticket's feature code is actually in main (or staging).
+
+    Guards against the silent-failure where a staging->main promo PR merges but
+    the ticket's feature branch was never merged into staging, so the promo
+    ships unrelated work and the ticket is wrongly marked Done. Finds the
+    ticket's OWN feature PR (open or merged) by identifier and checks whether
+    its head branch is fully contained in the current main. Promo PRs
+    (staging->main, title prefixed 'Promote') are EXCLUDED: their head is the
+    `staging` integration branch, trivially in main after any promo merge.
+    """
+    idl = ident.lower()
+    out, rc, _ = gh(["pr", "list", "--repo", f"{GITHUB_ORG}/{repo}",
+                     "--state", "all", "--limit", "100",
+                     "--json", "number,title,headRefName,state,mergedAt"])
+    if rc != 0 or not out:
+        return False
+    try:
+        prs = json.loads(out)
+    except Exception:
+        return False
+    for pr in prs:
+        title = pr.get("title", "") or ""
+        head = pr.get("headRefName") or ""
+        if title.strip().lower().startswith("promote") or head == "staging":
+            continue
+        hay = (f"{title} {head}").lower()
+        if idl not in hay:
+            continue
+        cmp, crc, _ = gh(["api", f"repos/{GITHUB_ORG}/{repo}/compare/main...{head}",
+                          "--jq", "{ahead_by,behind_by,status}"])
+        if crc == 0 and cmp:
+            try:
+                c = json.loads(cmp)
+                if c.get("behind_by") == 0 and c.get("ahead_by") == 0:
+                    return True
+            except Exception:
+                pass
+        if pr.get("state") == "MERGED" and pr.get("mergedAt"):
+            return True
+    return False
+
+
 def arm_auto_merge(repo, pr_url, delete_branch=False):
     """Arm GitHub auto-merge on an open PR. Idempotent — re-arming an already
     armed PR is a no-op. NEVER --delete-branch for staging->main promo PRs
@@ -231,6 +276,11 @@ def main():
             continue
 
         # Staging model: promotion = a staging->main promo PR.
+        # Only arm auto-merge if the ticket's feature is genuinely in main —
+        # otherwise a promo PR could merge without the feature (silent failure).
+        if not feature_in_main(repo, ident):
+            acted.append(f"{ident}: feature NOT in main — not arming auto-merge; feature branch not merged into staging")
+            continue
         existing = find_open_promo_pr(repo)
         if existing:
             pr_url = existing["url"]
