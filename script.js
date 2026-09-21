@@ -310,6 +310,43 @@ const PERSONAL_DEV_SAMPLE_REPORT = {
   conclusion: "You spent this period learning, often painfully, that you are allowed to be less. The growth scores confirm what the shed list already knew: the rebuild is working, and the next chapter is about protecting it on purpose.",
 };
 
+const WEEKLY_RESET_SAMPLE_REPORT = {
+  weekLabel: "Week of 14 Sep",
+  headline: "A week of steady momentum - you shipped the thing you'd been avoiding and finally protected an evening for yourself.",
+  atAGlance: [
+    "Shipped the migration you'd been dreading for a month",
+    "Said no to a meeting that would have wrecked your focus",
+    "Energy dipped midweek but recovered by Friday",
+  ],
+  wins: [
+    { title: "Shipped the migration", detail: "Finished the data migration you'd been putting off - it took one focused morning once you started.", quote: "I kept dreading it, and then it just... took a morning." },
+    { title: "Protected a real evening off", detail: "Left the laptop closed on Thursday and read instead of working late." },
+  ],
+  drains: [
+    { title: "Midweek meeting sprawl", detail: "Three back-to-back meetings on Wednesday left you with no deep-work time." },
+  ],
+  intentionReview: {
+    lastIntention: "Start the migration before Friday",
+    status: "kept",
+    insight: "You kept it because you made the first step tiny - opening the file and doing one task, not the whole thing.",
+  },
+  gratitude: ["A long walk on Tuesday", "A friend checking in at the right moment"],
+  letGo: ["The guilt about the migration you'd been carrying all month"],
+  nextFocus: {
+    intention: "Protect two deep-work mornings",
+    why: "The migration win showed you how much a single focused morning can move.",
+    firstStep: "Block Tuesday and Thursday 9-11am in your calendar tonight.",
+    measure: "Two mornings where you don't open email before noon.",
+  },
+  energy: { score: 6.5, note: "Drained by meetings midweek, refilled by the walk and the evening off." },
+  quotes: [
+    { section: "wins", text: "I kept dreading it, and then it just... took a morning." },
+    { section: "letGo", text: "The guilt was heavier than the work ever was." },
+  ],
+  sentiment: { label: "Steady", score: 42, note: "A grounded, slightly tired week that ended on a genuine high." },
+  conclusion: "A week that proved the value of a small first step and a protected evening. Next week is about defending two mornings of deep work.",
+};
+
 function gradeFor(score) {
   if (score >= 9.3) return "A+";
   if (score >= 8.7) return "A";
@@ -528,8 +565,11 @@ function initUploadView() {
 
   sampleBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    const isDev = selectedTool && selectedTool.id === "personal-development";
-    currentReport = normalizeReport(isDev ? PERSONAL_DEV_SAMPLE_REPORT : SAMPLE_REPORT);
+    const toolId = selectedTool && selectedTool.id;
+    let sample = SAMPLE_REPORT;
+    if (toolId === "personal-development") sample = PERSONAL_DEV_SAMPLE_REPORT;
+    else if (toolId === "weekly-reset") sample = WEEKLY_RESET_SAMPLE_REPORT;
+    currentReport = normalizeReport(sample);
     renderReport(currentReport);
     showView("report");
   });
