@@ -1987,6 +1987,145 @@ textarea.input {
   }
 }
 
+/* Weekly Reset report (BLD-1042) — compact one-page layout */
+.report-card__ataglance {
+  padding: 24px 48px;
+  background: var(--color-mint-light);
+  border-bottom: 1px solid rgba(45, 74, 62, 0.1);
+}
+.report-card__ataglance-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.report-card__ataglance-list li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+.report-card__ataglance-list li::before {
+  content: "·";
+  position: absolute;
+  left: 2px;
+  color: var(--color-accent-500);
+  font-weight: 700;
+}
+.report-card__grid--two {
+  grid-template-columns: 1fr 1fr;
+}
+.report-card__grid--two .report-card__col--your {
+  border-right: 1px solid rgba(45, 74, 62, 0.1);
+}
+.report-card__intention {
+  padding: 28px 48px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(45, 74, 62, 0.1);
+}
+.report-card__intention-text {
+  margin: 6px 0 8px;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+.report-card__intention-status {
+  display: inline-block;
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 2px 8px;
+  background: var(--color-neutral-100);
+  color: var(--color-text);
+}
+.report-card__intention-status--kept {
+  background: var(--color-mint-light);
+  color: var(--color-accent-800);
+}
+.report-card__intention-status--partial {
+  background: #F4E7DF;
+  color: #8A4B2A;
+}
+.report-card__intention-status--dropped {
+  background: #F6E3E3;
+  color: #8A2B2B;
+}
+.report-card__intention-insight {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+.report-card__nextfocus {
+  padding: 36px 48px;
+  background: var(--color-accent);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(45, 74, 62, 0.1);
+}
+.report-card__nextfocus .report-card__label {
+  color: rgba(255, 255, 255, 0.75);
+}
+.report-card__nextfocus-intention {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 8px 0 6px;
+  color: #ffffff;
+}
+.report-card__nextfocus-why {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 12px;
+}
+.report-card__nextfocus .report-card__measure {
+  color: rgba(255, 255, 255, 0.95);
+}
+.report-card__nextfocus .report-card__measure-tag {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+.report-card__energy {
+  padding: 28px 48px;
+  background: #ffffff;
+}
+.report-card__energy-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+.report-card__energy-score {
+  font-family: var(--font-heading);
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--color-accent);
+  line-height: 1;
+}
+.report-card__bar--energy {
+  flex: 1;
+}
+.report-card__energy-note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+.report-card__gratitude,
+.report-card__letgo {
+  padding: 28px 48px;
+  background: #ffffff;
+}
+.report-card__gratitude {
+  border-right: 1px solid rgba(45, 74, 62, 0.1);
+}
+
 /* Responsive adjustments */
 @media (max-width: 900px) {
   .landing-hero__grid {

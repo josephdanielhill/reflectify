@@ -110,6 +110,46 @@ Base every analysis field on genuine patterns in my actual answers, not generic 
 
 Save that JSON as a .json file so I can upload it to my reflection report tool.`;
 
+const WEEKLY_RESET_PROMPT_TEMPLATE = `You are guiding me through a short, mindful end-of-week reflection. Interview me one question at a time and wait for my answer before moving to the next. Keep your tone warm, quick, and practical - this is a 15-minute check-in, not a deep dive. Keep questions concise.
+
+Step 1: Ask what language I'd like to use for this reflection (e.g. English, German, Spanish, French). From that point on, ask every question in that language, and write every piece of prose in your final JSON output - headline, notes, analyses, quotes, conclusion, etc. - in that language too. Keep the JSON keys themselves in English exactly as specified below, regardless of the chosen language.
+Step 2: Ask which week this covers (e.g. "week of 14 Sep") and whether last week left me an intention to check on. If I had one, ask about it early and honestly.
+
+Then run a guided interview covering, roughly in this order:
+1. The week in one breath - what actually happened? (get the shape of the week in 2-3 sentences)
+2. Wins & pride - 2-3 things, however small; effort counts, not just outcomes. Ask for the one I'm most proud of.
+3. Drains & friction - what cost me energy this week, and what made me resist doing something?
+4. Last week's intention - did I do it? If it slipped, was it the intention, the plan, or the week? (no guilt - just honesty)
+5. Moments worth keeping - anything I'm grateful for or that refill me?
+6. What to let go - what from this week should NOT ride into next week?
+7. Next week's one focus - a single intention, why it matters, and one concrete first step with a way to know it worked.
+8. Energy check - ask for a 0-10 energy score and one sentence on what drained and what refilled me.
+
+Ask thoughtful follow-ups where they help, but keep the whole interview light and tight - one question per topic plus at most one follow-up.
+
+When the interview is complete, respond with ONLY a single JSON code block (no other text before or after) that exactly matches this schema:
+
+{
+  "weekLabel": "string", // e.g. "Week of 14 Sep"
+  "headline": "string", // one warm, specific sentence capturing this week
+  "atAGlance": ["string"], // 3 short bullets: the week distilled
+  "wins": [{ "title": "string", "detail": "string", "quote": "string" }], // 2-3 items; quote = optional verbatim first-person line from my answer
+  "drains": [{ "title": "string", "detail": "string" }], // 1-3 items
+  "intentionReview": { "lastIntention": "string", "status": "string", // one of: kept | partial | dropped | none
+    "insight": "string" }, // one honest sentence on why
+  "gratitude": ["string"], // 2-3 short things worth keeping
+  "letGo": ["string"], // 1-3 things deliberately dropped before next week
+  "nextFocus": { "intention": "string", "why": "string", "firstStep": "string", "measure": "string" },
+  "energy": { "score": number, "note": "string" }, // 0-10, one decimal allowed
+  "quotes": [{ "section": "string", "text": "string" }], // 2-4 short first-person quotes pulled verbatim from my answers, tagged with their section
+  "sentiment": { "label": "string", "score": number, "note": "string" }, // label: 1-2 words; score: -100..100 read of my overall tone; note: one sentence on what drives that read
+  "conclusion": "string" // 2-3 sentences closing the week gently and pointing at next week's focus
+}
+
+Base every analysis field on genuine patterns in my actual answers, not generic advice. Before writing the final JSON, review each analysis field (headline, atAGlance, intentionReview.insight, energy.note, sentiment.note, conclusion) and confirm it references a specific detail from my answers rather than a generic observation that could apply to anyone; rewrite any field that fails this check.
+
+Save that JSON as a .json file (for example week-reset.json) so I can upload it to my reflection report tool.`;
+
 const TOOLS = [
   {
     id: "job-reflection",
@@ -130,6 +170,16 @@ const TOOLS = [
       "Guides a forward-looking reflection on who you're becoming - values, growth, what you've shed, patterns, and your north star - then hands back a JSON file for a reflection summary.",
     promptTemplate: PERSONAL_DEV_PROMPT_TEMPLATE,
   },
+  {
+      id: "weekly-reset",
+      icon: "🌊",
+      name: "Weekly Reset",
+      image: "illustration-weekly-reset.jpg",
+      alpha: true,
+      description:
+        "A 15-minute, end-of-week mindful review that turns your week into a clear, honest picture of your wins, friction, energy flow, and next-week intentions.",
+      promptTemplate: WEEKLY_RESET_PROMPT_TEMPLATE,
+    },
 ];
 
 const SAMPLE_REPORT = {
@@ -325,6 +375,14 @@ function h(tag, attrs = {}, children = []) {
 
 // ---------- Tool selection ----------
 
+// Tool-specific analytics event name. Keeps the legacy "Job Reflection" label
+// for job-reflection (continuity with existing Fathom data) and uses the tool's
+// display name for the others (BLD-1042).
+function toolEventName(tool, action) {
+  const base = tool.id === "job-reflection" ? "Job Reflection" : tool.name;
+  return `${base}: ${action}`;
+}
+
 function initToolGrid() {
   const grid = document.getElementById("tool-grid");
 
@@ -348,9 +406,9 @@ function initToolGrid() {
       ]),
     ]);
     main.addEventListener("click", () => {
-      trackEvent("Job Reflection: Card Click");
-      selectTool(tool.id, "prompt");
-    });
+          trackEvent(toolEventName(tool, "Card Click"));
+          selectTool(tool.id, "prompt");
+        });
 
     const uploadLink = h(
       "a",
@@ -358,10 +416,10 @@ function initToolGrid() {
       "Already have a JSON file? Upload it →"
     );
     uploadLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      trackEvent("Job Reflection: Have JSON Click");
-      selectTool(tool.id, "upload");
-    });
+          e.preventDefault();
+          trackEvent(toolEventName(tool, "Have JSON Click"));
+          selectTool(tool.id, "upload");
+        });
 
     grid.appendChild(h("div", { class: "tool-card" }, [main, uploadLink]));
   });
@@ -575,6 +633,15 @@ function reportFramework(data) {
     data &&
     typeof data === "object" &&
     !Array.isArray(data) &&
+    (typeof data.weekLabel === "string" ||
+      (data.nextFocus && typeof data.nextFocus === "object"))
+  ) {
+    return "weekly-reset";
+  }
+  if (
+    data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
     (typeof data.season === "string" ||
       typeof data.lifeStory === "string" ||
       Array.isArray(data.values) ||
@@ -590,7 +657,9 @@ function reportFramework(data) {
 }
 
 function validateReport(data) {
-  return reportFramework(data) === "personal-development"
+  const fw = reportFramework(data);
+  if (fw === "weekly-reset") return validateWeeklyResetReport(data);
+  return fw === "personal-development"
     ? validatePersonalDevReport(data)
     : validateJobReport(data);
 }
@@ -697,9 +766,72 @@ function validatePersonalDevReport(data) {
   }
 
   return { valid: errors.length === 0, errors };
-}
+  }
 
-function titleDetailValidator(item, path, errs) {
+  // Weekly Reset framework validation. Load-bearing: weekLabel, nextFocus.intention,
+  // energy.score. Lenient on optional quotes, intentionReview (people skip it in
+  // their first week), gratitude, letGo, atAGlance.
+  function validateWeeklyResetReport(data) {
+    const errors = [];
+    const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+
+    if (!isObj(data)) {
+      return { valid: false, errors: ["The uploaded JSON must be a single object."] };
+    }
+
+    if (typeof data.weekLabel !== "string" || !data.weekLabel.trim()) {
+      errors.push('"weekLabel" must be a non-empty string (e.g. "Week of 14 Sep").');
+    }
+    if (typeof data.headline !== "string" || !data.headline.trim()) {
+      errors.push('"headline" must be a non-empty string.');
+    }
+
+    if (data.nextFocus === undefined || data.nextFocus === null || !isObj(data.nextFocus)) {
+      errors.push('"nextFocus" must be an object.');
+    } else if (typeof data.nextFocus.intention !== "string" || !data.nextFocus.intention.trim()) {
+      errors.push('"nextFocus.intention" must be a non-empty string.');
+    }
+
+    if (data.energy === undefined || data.energy === null || !isObj(data.energy)) {
+      errors.push('"energy" must be an object.');
+    } else if (
+      typeof data.energy.score !== "number" ||
+      Number.isNaN(data.energy.score) ||
+      data.energy.score < 0 ||
+      data.energy.score > 10
+    ) {
+      errors.push('"energy.score" must be a number between 0 and 10.');
+    }
+
+    if (data.atAGlance !== undefined && !Array.isArray(data.atAGlance)) {
+      errors.push('"atAGlance" must be an array if present.');
+    }
+    validateOptionalArray(data.wins, "wins", errors, (item, path, errs) => {
+      if (typeof item.title !== "string" || !item.title.trim()) errs.push(`"${path}.title" must be a non-empty string.`);
+    });
+    validateOptionalArray(data.drains, "drains", errors, (item, path, errs) => {
+      if (typeof item.title !== "string" || !item.title.trim()) errs.push(`"${path}.title" must be a non-empty string.`);
+    });
+    if (data.intentionReview !== undefined && data.intentionReview !== null && !isObj(data.intentionReview)) {
+      errors.push('"intentionReview" must be an object if present.');
+    }
+    if (data.gratitude !== undefined && !Array.isArray(data.gratitude)) {
+      errors.push('"gratitude" must be an array if present.');
+    }
+    if (data.letGo !== undefined && !Array.isArray(data.letGo)) {
+      errors.push('"letGo" must be an array if present.');
+    }
+    if (data.quotes !== undefined && !Array.isArray(data.quotes)) {
+      errors.push('"quotes" must be an array if present.');
+    }
+    if (data.sentiment !== undefined && data.sentiment !== null && !isObj(data.sentiment)) {
+      errors.push('"sentiment" must be an object if present.');
+    }
+
+    return { valid: errors.length === 0, errors };
+  }
+
+  function titleDetailValidator(item, path, errs) {
   if (typeof item.title !== "string" || !item.title.trim()) errs.push(`"${path}.title" must be a non-empty string.`);
   if (typeof item.detail !== "string" || !item.detail.trim()) errs.push(`"${path}.detail" must be a non-empty string.`);
 }
@@ -723,7 +855,9 @@ function validateOptionalArray(arr, name, errors, itemValidator) {
 // ---------- Normalize (lenient defaulting for optional/prose fields) ----------
 
 function normalizeReport(obj) {
-  return reportFramework(obj) === "personal-development"
+  const fw = reportFramework(obj);
+  if (fw === "weekly-reset") return normalizeWeeklyResetReport(obj);
+  return fw === "personal-development"
     ? normalizePersonalDevReport(obj)
     : normalizeJobReport(obj);
 }
@@ -882,14 +1016,79 @@ function normalizePersonalDevReport(obj) {
   }
 
   return r;
-}
-// Each topic is rendered as "your own words + the AI's read + what to do next"
+  }
+
+  // Weekly Reset normalizer: lenient defaulting for the weekly schema.
+  function normalizeWeeklyResetReport(obj) {
+    const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+    const r = Object.assign({}, obj);
+
+    r.weekLabel = r.weekLabel || "This week";
+    r.headline = r.headline || "";
+    r.atAGlance = Array.isArray(r.atAGlance) ? r.atAGlance : [];
+    r.wins = Array.isArray(r.wins) ? r.wins : [];
+    r.drains = Array.isArray(r.drains) ? r.drains : [];
+    r.gratitude = Array.isArray(r.gratitude) ? r.gratitude : [];
+    r.letGo = Array.isArray(r.letGo) ? r.letGo : [];
+
+    r.intentionReview = isObj(r.intentionReview) ? r.intentionReview : null;
+    if (r.intentionReview) {
+      r.intentionReview.lastIntention = r.intentionReview.lastIntention || "";
+      r.intentionReview.status = r.intentionReview.status || "none";
+      r.intentionReview.insight = r.intentionReview.insight || "";
+    }
+
+    r.nextFocus = isObj(r.nextFocus) ? r.nextFocus : null;
+    if (r.nextFocus) {
+      r.nextFocus.intention = r.nextFocus.intention || "";
+      r.nextFocus.why = r.nextFocus.why || "";
+      r.nextFocus.firstStep = r.nextFocus.firstStep || "";
+      r.nextFocus.measure = r.nextFocus.measure || "";
+    }
+
+    r.energy = isObj(r.energy) && typeof r.energy.score === "number" ? r.energy : null;
+    if (r.energy) {
+      r.energy.score = Math.max(0, Math.min(10, Number(r.energy.score) || 0));
+      r.energy.pct = Math.round(r.energy.score * 10) + "%";
+      r.energy.note = r.energy.note || "";
+    }
+
+    r.quotes = (Array.isArray(r.quotes) ? r.quotes : [])
+      .map((q) => {
+        if (typeof q === "string") return { section: "general", text: q };
+        if (q && typeof q === "object") {
+          const text = q.text || q.quote || null;
+          return text ? { section: (q.section || "general").toLowerCase(), text } : null;
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    r.sentiment = isObj(r.sentiment) ? r.sentiment : null;
+    if (r.sentiment) {
+      r.sentiment.score = Math.max(-100, Math.min(100, Number(r.sentiment.score) || 0));
+      r.sentiment.pct = (r.sentiment.score + 100) / 2 + "%";
+      r.sentiment.label = r.sentiment.label || "Mixed";
+      r.sentiment.note = r.sentiment.note || "";
+    }
+
+    if (!r.conclusion || typeof r.conclusion !== "string") {
+      r.conclusion = r.nextFocus && r.nextFocus.intention
+        ? `A week worth closing out. Heading into next week, the focus is ${r.nextFocus.intention.toLowerCase()}.`
+        : "A week worth closing out. Carry the wins forward and set one clear focus for next week.";
+    }
+
+    return r;
+  }
+  // Each topic is rendered as "your own words + the AI's read + what to do next"
 // (BLD-1006), with any verbatim quotes shown inside the section they came from
 // (BLD-1005). The report stays backward-compatible: every new field is optional
 // and legacy reports render fine when those fields are absent.
 
 function renderReport(report) {
-  return reportFramework(report) === "personal-development"
+  const fw = reportFramework(report);
+  if (fw === "weekly-reset") return renderWeeklyResetReport(report);
+  return fw === "personal-development"
     ? renderPersonalDevReport(report)
     : renderJobReport(report);
 }
@@ -1199,10 +1398,178 @@ function renderJobReport(report) {
       renderFooter(generatedDate),
     ]
       .filter(Boolean)
-      .forEach((node) => root.appendChild(node));
-    }
+            .forEach((node) => root.appendChild(node));
+          }
 
-    // A topic = a full-width band with a heading, then a two-column split:
+          // Weekly Reset renderer (BLD-1042): compact one-page layout. Header + week
+      // label, at-a-glance strip, wins/drains columns, intention review card,
+      // next-focus hero card (the section users screenshot), energy + sentiment,
+      // conclusion. Reuses renderTopic / renderReflectionItem / renderSuggestions /
+      // quoteNodes / renderConclusion / renderFooter.
+      function renderWeeklyResetReport(report) {
+        const root = document.getElementById("report-card") || document.getElementById("printable-report");
+        root.innerHTML = "";
+        const generatedDate = new Date().toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+
+        const atAGlance = Array.isArray(report.atAGlance) && report.atAGlance.length
+          ? h("div", { class: "report-card__ataglance" }, [
+              h("h6", { class: "report-card__label" }, "The week at a glance"),
+              h("ul", { class: "report-card__ataglance-list" },
+                report.atAGlance.map((b) => h("li", {}, b))),
+            ])
+          : null;
+
+        const wins = Array.isArray(report.wins) && report.wins.length
+          ? h("div", { class: "report-card__col report-card__col--your" }, [
+              h("h6", { class: "report-card__label report-card__label--muted" }, "Wins & pride"),
+              ...report.wins.map(renderReflectionItem),
+            ])
+          : null;
+
+        const drains = Array.isArray(report.drains) && report.drains.length
+          ? h("div", { class: "report-card__col report-card__col--your" }, [
+              h("h6", { class: "report-card__label report-card__label--muted" }, "Drains & friction"),
+              ...report.drains.map(renderReflectionItem),
+            ])
+          : null;
+
+        const winsDrains = wins || drains
+          ? h("div", { class: "report-card__grid report-card__grid--two" }, [wins, drains].filter(Boolean))
+          : null;
+
+        const intention = report.intentionReview
+          ? h("div", { class: "report-card__intention" }, [
+              h("h6", { class: "report-card__label" }, "Last week's intention"),
+              h("p", { class: "report-card__intention-text" },
+                report.intentionReview.lastIntention || "No intention set"),
+              h("span", { class: `report-card__intention-status report-card__intention-status--${report.intentionReview.status || "none"}` },
+                report.intentionReview.status || "none"),
+              report.intentionReview.insight
+                ? h("p", { class: "report-card__intention-insight" }, report.intentionReview.insight)
+                : null,
+            ])
+          : null;
+
+        const nextFocus = report.nextFocus
+          ? h("div", { class: "report-card__nextfocus" }, [
+              h("h6", { class: "report-card__label" }, "Next week's one focus"),
+              h("h3", { class: "report-card__nextfocus-intention" }, report.nextFocus.intention),
+              report.nextFocus.why
+                ? h("p", { class: "report-card__nextfocus-why" }, report.nextFocus.why)
+                : null,
+              report.nextFocus.firstStep
+                ? h("p", { class: "report-card__measure" }, [
+                    h("span", { class: "report-card__measure-tag" }, "First step"),
+                    report.nextFocus.firstStep,
+                  ])
+                : null,
+              report.nextFocus.measure
+                ? h("p", { class: "report-card__measure" }, [
+                    h("span", { class: "report-card__measure-tag" }, "How you'll know"),
+                    report.nextFocus.measure,
+                  ])
+                : null,
+            ])
+          : null;
+
+        const energy = report.energy
+          ? h("div", { class: "report-card__energy" }, [
+              h("h6", { class: "report-card__label" }, "Energy"),
+              h("div", { class: "report-card__energy-main" }, [
+                h("div", { class: "report-card__energy-score" }, String(report.energy.score)),
+                h("div", { class: "report-card__bar report-card__bar--energy" }, [
+                  h("div", { class: "report-card__bar-fill", style: `width:${report.energy.pct}` }),
+                ]),
+              ]),
+              report.energy.note
+                ? h("p", { class: "report-card__energy-note" }, report.energy.note)
+                : null,
+            ])
+          : null;
+
+        const sentiment = report.sentiment
+          ? h("div", { class: "report-card__sentiment-main" }, [
+              h("div", { class: "report-card__sentiment-meta" }, [
+                h("h6", { class: "report-card__label" }, "Sentiment"),
+                h("div", { class: "report-card__sentiment-value" }, report.sentiment.label),
+              ]),
+              h("div", { class: "report-card__sentiment-meter" }, [
+                h("div", { class: "report-card__bar report-card__bar--sentiment" }, [
+                  h("div", { class: "report-card__bar-fill", style: `width:${report.sentiment.pct}` }),
+                ]),
+                h("span", { class: "report-card__sentiment-score" }, String(report.sentiment.score)),
+              ]),
+              report.sentiment.note
+                ? h("p", { class: "report-card__sentiment-note" }, report.sentiment.note)
+                : null,
+            ])
+          : null;
+
+        const energySentiment = energy || sentiment
+          ? h("div", { class: "report-card__grid report-card__grid--two" }, [energy, sentiment].filter(Boolean))
+          : null;
+
+        const gratitude = Array.isArray(report.gratitude) && report.gratitude.length
+          ? h("div", { class: "report-card__gratitude" }, [
+              h("h6", { class: "report-card__label" }, "Moments worth keeping"),
+              h("ul", { class: "report-card__suggest" }, report.gratitude.map((g) => h("li", {}, g))),
+            ])
+          : null;
+
+        const letGo = Array.isArray(report.letGo) && report.letGo.length
+          ? h("div", { class: "report-card__letgo" }, [
+              h("h6", { class: "report-card__label" }, "Letting go"),
+              h("ul", { class: "report-card__suggest" }, report.letGo.map((g) => h("li", {}, g))),
+            ])
+          : null;
+
+        const keepDrop = gratitude || letGo
+          ? h("div", { class: "report-card__grid report-card__grid--two" }, [gratitude, letGo].filter(Boolean))
+          : null;
+
+        const generalQuotes = renderGeneralQuotes(report);
+
+        [
+          h("div", { class: "report-card__header" }, [
+            h("div", { class: "report-card__header-top" }, [
+              h("div", { class: "report-card__brand" }, [
+                h("svg", { class: "report-card__brand-logo", width: "240", height: "56", viewBox: "0 0 280 64", fill: "none", xmlns: "http://www.w3.org/2000/svg", role: "img", "aria-label": "Reflectify" }, [
+                  h("g", { transform: "translate(4, 4)" }, [
+                    h("rect", { x: "0", y: "0", width: "56", height: "56", rx: "28", fill: "#EBF3EF" }),
+                    h("path", { d: "M28 11 C 14 25, 14 39, 28 44 C 42 39, 42 25, 28 11 Z", fill: "#2D4A3E" }),
+                    h("path", { d: "M28 19 C 38 26, 38 37, 28 41", stroke: "#E8A88A", "stroke-width": "3.5", "stroke-linecap": "round", fill: "none" }),
+                  ]),
+                  h("text", { x: "76", y: "44", "font-family": "Newsreader, Georgia, serif", "font-weight": "500", "font-size": "38", fill: "#2D4A3E", "letter-spacing": "-0.8" }, "Reflectify"),
+                ]),
+              ]),
+              h("span", { class: "report-card__period-badge" }, report.weekLabel),
+            ]),
+            h("div", { class: "report-card__header-main" }, [
+              h("div", { class: "report-card__title-group" }, [
+                h("h1", { class: "report-card__title" }, "Weekly Reset"),
+                h("p", { class: "report-card__headline" }, report.headline),
+              ]),
+            ]),
+          ]),
+          atAGlance,
+          winsDrains,
+          intention,
+          nextFocus,
+          energySentiment,
+          keepDrop,
+          generalQuotes,
+          renderConclusion(report),
+          renderFooter(generatedDate),
+        ]
+          .filter(Boolean)
+          .forEach((node) => root.appendChild(node));
+      }
+
+          // A topic = a full-width band with a heading, then a two-column split:
 // left  = the user's own reflection (items + their verbatim quotes)
 // right = the AI analysis + personalized recommendations
 function renderTopic(index, title, leftCol, rightCol, rightHeading = "Analysis & next steps") {
@@ -1559,7 +1926,12 @@ function sanitizeFilename(str) {
 }
 
 function filenameFor(extension) {
-  const isDev = reportFramework(currentReport) === "personal-development";
+  const fw = reportFramework(currentReport);
+  if (fw === "weekly-reset") {
+    const week = sanitizeFilename(currentReport.weekLabel || "this-week");
+    return `week-reset-${week}.${extension}`;
+  }
+  const isDev = fw === "personal-development";
   const job = sanitizeFilename(isDev ? "personal-development-reflection" : currentReport.jobTitle);
   const date = new Date().toISOString().slice(0, 10);
   return `reflect-card-${job}-${date}.${extension}`;
