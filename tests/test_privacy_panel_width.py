@@ -41,16 +41,19 @@ class PrivacyPanelWidthTest(unittest.TestCase):
     def test_privacy_box_resets_to_full_width_on_single_column_breakpoint(self):
         """At <=900px the grid collapses to one column, so the privacy box
         must return to full width to keep matching the panels."""
-        # The <=900px media query must contain a .landing-process__privacy
-        # rule that overrides the desktop width back to 100%.
+        # Find the responsive <=900px rule where the process grid becomes
+        # single-column, then the .landing-process__privacy rule that follows
+        # it (in the same media query) must override width back to 100%.
         m = re.search(
-            r"@media \(max-width:\s*900px\)\s*\{.*?\.landing-process__privacy\s*\{([^}]*)\}",
+            r"\.landing-process__grid\s*\{\s*grid-template-columns:\s*1fr;?\s*\}"
+            r"([\s\S]*?)\.landing-process__privacy\s*\{([^}]*)\}",
             self.css,
-            re.DOTALL,
         )
-        self.assertIsNotNone(m, "missing <=900px media query touching the privacy box")
+        self.assertIsNotNone(
+            m, "missing <=900px single-column grid + privacy reset in style.css"
+        )
         self.assertRegex(
-            m.group(1),
+            m.group(2),
             r"width:\s*100%",
             "privacy box must be full width again at the single-column breakpoint",
         )
