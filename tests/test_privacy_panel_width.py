@@ -1,17 +1,18 @@
-"""Regression test for BLD-1052: the "Your Privacy" box on the home screen
-must match the width of the three panels in the guided-workflow grid above it.
+"""Regression test for the "Your privacy" panel width bug (BLD-1065).
 
-The guided-workflow grid (.landing-process__grid) is a 3-column grid
-(repeat(3, 1fr)) with a 32px gap; together the three panels span the full
-width of their container. The privacy note (<p class="landing-process__privacy">)
-sits inside the SAME container as the grid (.landing-process__inner), so it
-naturally spans the exact same width as all three panels combined - matching
-them exactly. It must NOT be pinned to a single 1/3 column (which made it
-narrow and left-aligned - the reworked bug), and must NOT be outside the
-container where it would outgrow the grid (the original bug).
+The privacy panel (`.landing-process__privacy`) sits as a direct child of the
+full-width `.landing-process-section`. Before this fix it spanned 100% of the
+section and was therefore much wider than the three step cards above it, which
+are constrained inside `.landing-process__inner` (max-width 1160px, auto
+margins). This test asserts at the source level that the privacy panel is
+constrained by the SAME width budget as the cards container, so a future edit
+cannot silently widen it again.
 
-Run with:
-    python3 -m unittest discover -s tests -v
+The actual visual alignment is also independently verified at render time (see
+the issue), but this guards the rule at the source so regressions are caught by
+`python3 -m unittest discover -s tests -v`.
+
+Run with:  python3 -m unittest discover -s tests -v
 """
 
 import pathlib
@@ -20,78 +21,57 @@ import unittest
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 
+STYLE_CSS = REPO_ROOT / "style.css"
+
+# `.landing-process__inner` constrains the three step cards.
+INNER_MAX_WIDTH = "1160px"
+
+
+def _rule_block(css, selector):
+    """Return the normalised declaration-block body for the first rule matching
+    ``selector``, or the empty string."""
+    pattern = re.compile(
+        r"^\s*" + re.escape(selector) + r"\s*\{(.*?)\}", re.DOTALL | re.MULTILINE
+    )
+    match = pattern.search(css)
+    if not match:
+        return ""
+    # Collapse whitespace so "max-width: 1160px;" and "max-width:1160px;" agree.
+    return re.sub(r"\s+", " ", match.group(1))
+
 
 class PrivacyPanelWidthTest(unittest.TestCase):
-    def setUp(self):
-        self.css = (REPO_ROOT / "style.css").read_text(encoding="utf-8")
-        self.html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text()
 
-    def test_privacy_box_must_not_be_pinned_to_single_track(self):
-        """The privacy box must NOT be forced to a single 1/3-column width.
-        That was the reworked bug (narrow, left-aligned panel)."""
-        m = re.search(
-            r"\.landing-process__privacy\s*\{([^}]*)\}", self.css, re.DOTALL
-        )
-        self.assertIsNotNone(m, "missing .landing-process__privacy rule")
-        block = m.group(1)
-        self.assertNotRegex(
-            block,
-            r"width:\s*calc\(",
-            "privacy box must not be constrained to a single grid track width",
+    def test_style_css_present(self):
+        self.assertTrue(STYLE_CSS.is_file(), "missing style.css")
+
+    def test_privacy_panel_rule_exists(self):
+        self.assertTrue(
+            _rule_block(self.css, ".landing-process__privacy"),
+            "expected a .landing-process__privacy rule in style.css",
         )
 
-    def test_privacy_box_shares_the_grid_container(self):
-        """The privacy note must live inside .landing-process__inner alongside
-        the grid, so it inherits the exact combined width of the three panels
-        without outgrowing them and without collapsing to one column."""
-        # The privacy <p> must appear after the grid div opens and before the
-        # .landing-process__inner container closes. We find the grid div, then
-        # require the NEXT element after the grid's closing </div> (before the
-        # inner container's closing </div>) to be the privacy note.
-        grid_open = self.html.find('class="landing-process__grid"')
-        self.assertNotEqual(
-            grid_open, -1, "guided-workflow grid missing from markup"
-        )
-        # Everything from the grid open to the end of the section.
-        tail = self.html[grid_open:]
-        # The privacy <p> must come before the tool-grid section (i.e. it is
-        # still part of the guided-workflow block, not the following section).
-        boundary = tail.find("landing-tools-wrapper")
-        self.assertNotEqual(
-            boundary, -1, "could not find end of guided-workflow block"
-        )
-        block = tail[:boundary]
-        self.assertIn(
-            'class="landing-process__privacy"',
-            block,
-            "privacy note must be inside the guided-workflow block "
-            "(inside .landing-process__inner, not a sibling below it)",
-        )
-        # And it must come AFTER the grid (grid opens, then steps, then the
-        # note) - i.e. it sits at the bottom of the block, not before the grid.
-        self.assertGreater(
-            block.find('class="landing-process__privacy"'),
-            block.find("process-card"),
-            "privacy note must come after the step panels inside the container",
+    def test_privacy_panel_matches_cards_max_width(self):
+        """The privacy panel must be capped at the same max-width as the cards."""
+        block = _rule_block(self.css, ".landing-process__privacy")
+        self.assertIn("max-width: " + INNER_MAX_WIDTH, block)
+
+    def test_privacy_panel_is_centered(self):
+        """auto horizontal margins keep it aligned with the centered cards."""
+        block = _rule_block(self.css, ".landing-process__privacy")
+        self.assertTrue(
+            re.search(r"margin\s*:\s*[^;]*auto[^;]*;", block),
+            "privacy panel should use auto horizontal margins (shorthand), "
+            f"got block: {block!r}",
         )
 
-    def test_privacy_note_still_present_in_markup(self):
-        """Sanity: the privacy note element remains in the guided workflow."""
-        self.assertIn(
-            "landing-process__privacy", self.html, "privacy note element missing"
-        )
-
-    def test_no_full_width_override_left_on_privacy_rule(self):
-        """The desktop privacy rule must have no explicit width override -
-        it correctly inherits the container width. Any explicit width here
-        would risk the narrow-left or outgrow bugs."""
-        m = re.search(
-            r"\.landing-process__privacy\s*\{([^}]*)\}", self.css, re.DOTALL
-        )
-        block = m.group(1)
-        self.assertNotRegex(
-            block, r"width:\s*[^;]+;", "privacy rule should not set a width"
-        )
+    def test_cards_inner_still_keeps_its_budget(self):
+        """Sanity: the cards container still defines the reference max-width."""
+        block = _rule_block(self.css, ".landing-process__inner")
+        self.assertIn("max-width: " + INNER_MAX_WIDTH, block)
 
 
 if __name__ == "__main__":
