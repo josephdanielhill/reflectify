@@ -240,6 +240,35 @@ def close_ticket(issue_id):
         return False
 
 
+def dedupe_promo_prs(repo, keep_url):
+    """Close any open staging->main promo PRs for repo other than `keep_url`.
+
+    The backstop and the mini's promotion cron both run every 10 min and can
+    race: each checks find_open_promo_pr() (sees none) then both create a
+    staging->main promo PR at the same second. GitHub permits only ONE open PR
+    per base/head, so the second create usually fails — but close any stragglers
+    to be safe, keeping the earliest-created one.
+    """
+    out, rc, _ = gh(["pr", "list", "--repo", f"{GITHUB_ORG}/{repo}",
+                     "--base", "main", "--head", "staging",
+                     "--state", "open", "--json", "number,url,createdAt"])
+    if rc != 0 or not out:
+        return
+    try:
+        prs = json.loads(out)
+    except Exception:
+        return
+    prs = [pr for pr in prs if not pr.get("mergedAt")]
+    if len(prs) <= 1:
+        return
+    prs.sort(key=lambda pr: pr.get("createdAt") or "")
+    for pr in prs[1:]:
+        num = pr.get("number")
+        if num:
+            gh(["pr", "close", str(num), "--repo", f"{GITHUB_ORG}/{repo}",
+                "--comment", "Duplicate staging->main promo PR (race between backstop and promotion cron); keeping the first."])
+
+
 def main():
     if not linear_key():
         print("ERROR: LINEAR_API_KEY not set", file=sys.stderr)
@@ -310,6 +339,7 @@ def main():
                 pr_url = out.splitlines()[-1] if out else out
                 if not pr_url.startswith("https://"):
                     pr_url = f"https://github.com/{GITHUB_ORG}/{repo}/pull/{pr_url}"
+                dedupe_promo_prs(repo, pr_url)
                 ok, aerr = arm_auto_merge(repo, pr_url)
                 acted.append(f"{ident}: raised promo PR, auto-merge "
                              + ("armed" if ok else f"FAILED to arm ({aerr})")
