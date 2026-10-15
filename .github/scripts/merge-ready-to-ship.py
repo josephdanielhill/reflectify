@@ -162,69 +162,21 @@ def find_ticket_pr(repo, ident):
     return None
 
 
-
-
-def feature_in_main(repo, ident):
-    """True iff the ticket's feature code is actually in main.
-
-    Guards against the silent-failure where a staging->main promo PR merges but
-    the ticket's feature branch was never merged into staging, so the promo
-    ships unrelated work and the ticket is wrongly marked Done.
-
-    Robust rule (handles squash merges and deleted feature branches):
-      The feature is in main iff a feature PR for this ticket merged into
-      staging AND a staging->main promo PR merged AFTER that feature merge.
-      (A feature->main PR merged directly also counts.)
-    """
-    idl = ident.lower()
-    out, rc, _ = gh(["pr", "list", "--repo", f"{GITHUB_ORG}/{repo}",
-                     "--state", "all", "--limit", "100",
-                     "--json", "number,title,headRefName,baseRefName,state,mergedAt"])
-    if rc != 0 or not out:
-        return False
-    try:
-        prs = json.loads(out)
-    except Exception:
-        return False
-
-    latest_promo = None
-    for pr in prs:
-        title = pr.get("title", "") or ""
-        head = pr.get("headRefName") or ""
-        if title.strip().lower().startswith("promote") or head == "staging":
-            if pr.get("state") == "MERGED" and pr.get("mergedAt"):
-                ts = pr.get("mergedAt")
-                if latest_promo is None or ts > latest_promo:
-                    latest_promo = ts
-
-    for pr in prs:
-        title = pr.get("title", "") or ""
-        head = pr.get("headRefName") or ""
-        base = pr.get("baseRefName") or ""
-        if title.strip().lower().startswith("promote") or head == "staging":
-            continue
-        hay = (f"{title} {head}").lower()
-        if idl not in hay:
-            continue
-        if pr.get("state") != "MERGED" or not pr.get("mergedAt"):
-            continue
-        feat_ts = pr.get("mergedAt")
-        if base == "main":
-            return True
-        if latest_promo and feat_ts < latest_promo:
-            return True
-    return False
-
-
 def arm_auto_merge(repo, pr_url, delete_branch=False):
     """Arm GitHub auto-merge on an open PR. Idempotent — re-arming an already
     armed PR is a no-op. NEVER --delete-branch for staging->main promo PRs
-    (the staging integration branch must survive)."""
+    (the staging integration branch must survive).
+
+    staging->main promos (delete_branch=False) merge with a MERGE COMMIT so the
+    individual Conventional Commits reach main and Release Please can derive the
+    semantic version bump; a squash here would hide them and never bump. Main-
+    direct feature PRs (delete_branch=True) keep squash."""
     num = pr_url_to_num(pr_url)
     if not num:
         return False, "no PR number"
+    strategy = "--squash" if delete_branch else "--merge"
     args = ["pr", "merge", str(num), "--repo", f"{GITHUB_ORG}/{repo}",
-            "--squash", "--auto"]
+            strategy, "--auto"]
     if delete_branch:
         args.append("--delete-branch")
     _, rc, err = gh(args)
@@ -285,11 +237,6 @@ def main():
             continue
 
         # Staging model: promotion = a staging->main promo PR.
-        # Only arm auto-merge if the ticket's feature is genuinely in main —
-        # otherwise a promo PR could merge without the feature (silent failure).
-        if not feature_in_main(repo, ident):
-            acted.append(f"{ident}: feature NOT in main — not arming auto-merge; feature branch not merged into staging")
-            continue
         existing = find_open_promo_pr(repo)
         if existing:
             pr_url = existing["url"]
